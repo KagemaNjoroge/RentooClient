@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import '../../constants.dart';
 import '../../utils/snack.dart';
 
-
 class Communication extends StatefulWidget {
   const Communication({super.key});
 
@@ -16,82 +15,32 @@ class _CommunicationState extends State<Communication> {
     {
       "from": "Kagema Njoroge",
       "time": DateTime.now(),
-      "message": "I will be settling the rent payments this weekend"
+      "message": "I will be settling the rent payments this weekend",
+      "read": false,
     },
     {
-      "from": "Kagema Njoroge",
+      "read": true,
+      "from": "Jane Doe",
       "time": DateTime.now(),
-      "message": "I will be settling the rent payments this weekend"
+      "message": "I have not received the rent payment yet",
     },
     {
-      "from": "Kagema Njoroge",
+      "read": false,
+      "from": "Albert Einstein",
       "time": DateTime.now(),
-      "message": "I will be settling the rent payments this weekend"
+      "message": "E=mc^2",
     },
     {
-      "from": "Kagema Njoroge",
+      "read": true,
+      "from": "Isaac Newton",
       "time": DateTime.now(),
-      "message": "I will be settling the rent payments this weekend"
+      "message": "F=ma",
     },
     {
-      "from": "Kagema Njoroge",
+      "read": false,
+      "from": "Berkshire Hathaway",
       "time": DateTime.now(),
-      "message": "I will be settling the rent payments this weekend"
-    },
-    {
-      "from": "Kagema Njoroge",
-      "time": DateTime.now(),
-      "message": "I will be settling the rent payments this weekend"
-    },
-    {
-      "from": "Kagema Njoroge",
-      "time": DateTime.now(),
-      "message": "I will be settling the rent payments this weekend"
-    },
-    {
-      "from": "Kagema Njoroge",
-      "time": DateTime.now(),
-      "message": "I will be settling the rent payments this weekend"
-    },
-    {
-      "from": "Kagema Njoroge",
-      "time": DateTime.now(),
-      "message": "I will be settling the rent payments this weekend"
-    },
-    {
-      "from": "Kagema Njoroge",
-      "time": DateTime.now(),
-      "message": "I will be settling the rent payments this weekend"
-    },
-    {
-      "from": "Kagema Njoroge",
-      "time": DateTime.now(),
-      "message": "I will be settling the rent payments this weekend"
-    },
-    {
-      "from": "Kagema Njoroge",
-      "time": DateTime.now(),
-      "message": "I will be settling the rent payments this weekend"
-    },
-    {
-      "from": "Kagema Njoroge",
-      "time": DateTime.now(),
-      "message": "I will be settling the rent payments this weekend"
-    },
-    {
-      "from": "Kagema Njoroge",
-      "time": DateTime.now(),
-      "message": "I will be settling the rent payments this weekend"
-    },
-    {
-      "from": "Kagema Njoroge",
-      "time": DateTime.now(),
-      "message": "I will be settling the rent payments this weekend"
-    },
-    {
-      "from": "Kagema Njoroge",
-      "time": DateTime.now(),
-      "message": "I will be settling the rent payments this weekend"
+      "message": "We are interested in your property",
     }
   ];
   final TextEditingController _messageController = TextEditingController();
@@ -118,6 +67,14 @@ class _CommunicationState extends State<Communication> {
                 child: ListView.builder(
                   itemBuilder: (context, index) {
                     return ListTile(
+                      trailing: messages[index]['read']
+                          ? const Icon(Icons.done)
+                          : const Icon(Icons.done_all),
+                      leading: const CircleAvatar(
+                        radius: 30,
+                        backgroundImage: NetworkImage(
+                            "https://www.w3schools.com/w3images/avatar2.png"),
+                      ),
                       onTap: () {
                         showSnackBar(
                             context, Colors.red, "Add action here", 300);
@@ -134,7 +91,47 @@ class _CommunicationState extends State<Communication> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text("Messages"),
+                    Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(color: kPrimaryColor),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      padding: const EdgeInsets.all(8),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Row(
+                            children: [
+                              CircleAvatar(
+                                radius: 30,
+                                backgroundImage: NetworkImage(
+                                    "https://www.w3schools.com/w3images/avatar2.png"),
+                              ),
+                              SizedBox(
+                                width: 5,
+                              ),
+                              Text(
+                                "Kagema Njoroge",
+                                style: TextStyle(
+                                    fontSize: 10, fontWeight: FontWeight.bold),
+                              ),
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              IconButton(
+                                onPressed: () {},
+                                icon: const Icon(Icons.call),
+                              ),
+                              IconButton(
+                                onPressed: () {},
+                                icon: const Icon(Icons.videocam),
+                              ),
+                            ],
+                          )
+                        ],
+                      ),
+                    ),
                     Container(
                       margin: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
