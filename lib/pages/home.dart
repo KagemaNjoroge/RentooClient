@@ -196,7 +196,7 @@ class _HomeState extends State<Home> {
                   showSnackBar(
                       context, Colors.green, "Attach action here", 300);
                 },
-                icon: const Icon(Icons.computer_sharp),
+                icon: const Icon(Icons.assistant),
               ),
             ),
           ],
