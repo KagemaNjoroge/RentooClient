@@ -36,63 +36,81 @@ class _CompanyHomeState extends State<CompanyHome> {
         }
         if (snapshot.connectionState == ConnectionState.done &&
             snapshot.hasData) {
-          Company comp = snapshot.data!['companies'][0];
-
-          return Column(
-            children: [
-              Container(
-                margin: const EdgeInsets.all(8),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      comp.name ?? '',
-                      style: const TextStyle(
-                          fontWeight: FontWeight.bold, fontSize: 30),
-                    ),
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        ElevatedButton.icon(
-                          onPressed: () {
-                            setState(() {
-                              _enabled = true;
-                            });
-                          },
-                          label: const Text("Edit"),
-                          icon: const Icon(Icons.edit),
-                        ),
-                        const SizedBox(
-                          width: 5,
-                        ),
-                        _enabled
-                            ? ElevatedButton.icon(
-                                onPressed: () {},
-                                label: const Text("Save"),
-                                icon: const Icon(Icons.done),
-                              )
-                            : const SizedBox()
-                      ],
-                    )
-                  ],
+          if (snapshot.data!['companies'].isEmpty) {
+            return Center(
+                child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text("Company details not found"),
+                const SizedBox(
+                  height: 10,
                 ),
-              ),
-              Card(
-                child: Form(
-                  key: _formKey,
-                  child: Column(
+                ElevatedButton.icon(
+                  onPressed: () {},
+                  icon: const Icon(Icons.add),
+                  label: const Text("Configure company"),
+                )
+              ],
+            ));
+          } else {
+            Company comp = snapshot.data!['companies'][0];
+
+            return Column(
+              children: [
+                Container(
+                  margin: const EdgeInsets.all(8),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      TextFormField(
-                        initialValue: comp.name,
-                        enabled: _enabled,
-                        decoration: const InputDecoration(),
+                      Text(
+                        comp.name ?? '',
+                        style: const TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 30),
                       ),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          ElevatedButton.icon(
+                            onPressed: () {
+                              setState(() {
+                                _enabled = true;
+                              });
+                            },
+                            label: const Text("Edit"),
+                            icon: const Icon(Icons.edit),
+                          ),
+                          const SizedBox(
+                            width: 5,
+                          ),
+                          _enabled
+                              ? ElevatedButton.icon(
+                                  onPressed: () {},
+                                  label: const Text("Save"),
+                                  icon: const Icon(Icons.done),
+                                )
+                              : const SizedBox()
+                        ],
+                      )
                     ],
                   ),
                 ),
-              )
-            ],
-          );
+                Card(
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      children: [
+                        TextFormField(
+                          initialValue: comp.name,
+                          enabled: _enabled,
+                          decoration: const InputDecoration(),
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+              ],
+            );
+          }
         }
         if (snapshot.hasError) {
           return const Text("An error occurred");
