@@ -27,3 +27,8 @@ const String applicationName = "RentooPMS";
 const String applicationLegalese =
     "Brought to you by the good folks at TomorrowAI";
 const String applicationVersion = "0.1.0";
+
+
+
+// endpoints
+const companyUrl = "http://localhost:8000/company/";
