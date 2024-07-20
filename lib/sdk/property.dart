@@ -16,7 +16,6 @@ class PropertyAPI implements BaseApi {
         for (var prop in response.data) {
           property.add(Property.fromJson(prop));
         }
-
         return {
           "status": "success",
           "property": property,
