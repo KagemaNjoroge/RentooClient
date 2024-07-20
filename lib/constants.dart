@@ -28,11 +28,12 @@ const String applicationLegalese =
     "Brought to you by the good folks at TomorrowAI";
 const String applicationVersion = "0.1.0";
 
-
-
 // endpoints
 const companyUrl = "http://localhost:8000/company/";
 const propertyUrl = "http://localhost:8000/properties/";
 const housesUrl = "http://localhost:8000/houses/";
 const tenantsUrl = "http://localhost:8000/tenants";
 const leasesUrl = "http://localhost:8000/leases/";
+const notificationsUrl = "http://localhost:8000/notifications/";
+const unitsUrl = 'http://localhost:8000/units/';
+const agentsUrl = "http://localhost:8000/agents/";
