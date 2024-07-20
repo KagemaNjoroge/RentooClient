@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:rentoo_pms/sdk/company.dart';
 
+import '../../constants.dart';
 import '../../models/company.dart';
-import '../../utils/company.dart';
 
 class CompanyHome extends StatefulWidget {
   const CompanyHome({super.key});
@@ -16,10 +17,64 @@ class _CompanyHomeState extends State<CompanyHome> {
 
   bool _enabled = false;
 
+  // controllers & keys
+  final GlobalKey<FormState> _addformKey = GlobalKey();
+  // name, phone, email, website
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _websiteController = TextEditingController();
+  final Widget _gap = const SizedBox(height: 10);
+  Widget _addCompanyDetailsModal() {
+    return Form(
+      key: _addformKey,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          TextFormField(
+            controller: _nameController,
+            decoration: const InputDecoration(
+              icon: Icon(Icons.business),
+              labelText: "Company name",
+              hintText: "Enter company name",
+            ),
+          ),
+          _gap,
+          TextFormField(
+            controller: _phoneController,
+            decoration: const InputDecoration(
+              icon: Icon(Icons.phone),
+              labelText: "Phone number",
+              hintText: "Enter phone number",
+            ),
+          ),
+          _gap,
+          TextFormField(
+            controller: _emailController,
+            decoration: const InputDecoration(
+              icon: Icon(Icons.email),
+              labelText: "Email",
+              hintText: "Enter email",
+            ),
+          ),
+          _gap,
+          TextFormField(
+            controller: _websiteController,
+            decoration: const InputDecoration(
+              icon: Icon(Icons.web),
+              labelText: "Website",
+              hintText: "Enter website",
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: fetchCompany(),
+      future: CompanyAPI().get(companyUrl),
       initialData: const {
         "id": 0,
         "name": "",
@@ -46,14 +101,40 @@ class _CompanyHomeState extends State<CompanyHome> {
                   height: 10,
                 ),
                 ElevatedButton.icon(
-                  onPressed: () {},
+                  onPressed: () {
+                    showDialog(
+                      context: context,
+                      builder: (_) => AlertDialog(
+                        title: const Text("Add company details"),
+                        content: _addCompanyDetailsModal(),
+                        actions: [
+                          TextButton.icon(
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                            label: const Text("Cancel"),
+                            icon: const Icon(Icons.close),
+                          ),
+                          TextButton.icon(
+                            onPressed: () async {
+                              if (_addformKey.currentState!.validate()) {
+                                // TODO: Add company
+                              }
+                            },
+                            label: const Text("Save"),
+                            icon: const Icon(Icons.done),
+                          )
+                        ],
+                      ),
+                    );
+                  },
                   icon: const Icon(Icons.add),
                   label: const Text("Configure company"),
                 )
               ],
             ));
           } else {
-            Company comp = snapshot.data!['companies'][0];
+            Company comp = snapshot.data!['companies'].first;
 
             return Column(
               children: [
