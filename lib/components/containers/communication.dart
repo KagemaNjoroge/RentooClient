@@ -44,6 +44,7 @@ class _CommunicationState extends State<Communication> {
     }
   ];
   final TextEditingController _messageController = TextEditingController();
+  bool _sendEnabled = false;
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -135,8 +136,9 @@ class _CommunicationState extends State<Communication> {
                     Container(
                       margin: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                          border: Border.all(color: kPrimaryColor),
-                          borderRadius: BorderRadius.circular(10)),
+                        border: Border.all(color: kPrimaryColor),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
                       child: Row(
                         children: [
                           IconButton(
@@ -149,6 +151,11 @@ class _CommunicationState extends State<Communication> {
                           ),
                           Expanded(
                             child: TextField(
+                              onChanged: (value) {
+                                setState(() {
+                                  _sendEnabled = value.isNotEmpty;
+                                });
+                              },
                               controller: _messageController,
                               decoration: const InputDecoration(
                                   hintText: "Hey there",
@@ -156,9 +163,7 @@ class _CommunicationState extends State<Communication> {
                             ),
                           ),
                           IconButton(
-                            onPressed: _messageController.text.isNotEmpty
-                                ? () {}
-                                : null,
+                            onPressed: _sendEnabled ? () {} : null,
                             icon: const Icon(Icons.send),
                           )
                         ],
