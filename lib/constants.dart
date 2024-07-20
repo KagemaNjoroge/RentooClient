@@ -32,3 +32,6 @@ const String applicationVersion = "0.1.0";
 
 // endpoints
 const companyUrl = "http://localhost:8000/company/";
+const propertyUrl = "http://localhost:8000/properties/";
+const housesUrl = "http://localhost:8000/houses/";
+const tenantsUrl = "http://localhost:8000/tenants";
