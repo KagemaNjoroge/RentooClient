@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:rentoo_pms/sdk/company.dart';
 
 import '../../constants.dart';
 import '../../models/company.dart';
+import '../../sdk/company.dart';
+import '../../utils/snack.dart';
 
 class CompanyHome extends StatefulWidget {
   const CompanyHome({super.key});
@@ -12,10 +13,9 @@ class CompanyHome extends StatefulWidget {
 }
 
 class _CompanyHomeState extends State<CompanyHome> {
-  // controllers and keys
-  final GlobalKey<FormState> _formKey = GlobalKey();
+  final CompanyAPI _companyAPI = CompanyAPI();
 
-  bool _enabled = false;
+  bool _loading = false;
 
   // controllers & keys
   final GlobalKey<FormState> _addformKey = GlobalKey();
@@ -32,19 +32,28 @@ class _CompanyHomeState extends State<CompanyHome> {
         mainAxisSize: MainAxisSize.min,
         children: [
           TextFormField(
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return "Company name is required";
+              }
+              return null;
+            },
             controller: _nameController,
             decoration: const InputDecoration(
               icon: Icon(Icons.business),
-              labelText: "Company name",
+              labelText: "Company name*",
               hintText: "Enter company name",
             ),
           ),
           _gap,
           TextFormField(
             controller: _phoneController,
+            validator: (value) => value!.length < 10
+                ? "Phone number must be at least 10 characters"
+                : null,
             decoration: const InputDecoration(
               icon: Icon(Icons.phone),
-              labelText: "Phone number",
+              labelText: "Phone number*",
               hintText: "Enter phone number",
             ),
           ),
@@ -74,7 +83,7 @@ class _CompanyHomeState extends State<CompanyHome> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: CompanyAPI().get(companyUrl),
+      future: _companyAPI.get(companyUrl),
       initialData: const {
         "id": 0,
         "name": "",
@@ -118,11 +127,33 @@ class _CompanyHomeState extends State<CompanyHome> {
                           TextButton.icon(
                             onPressed: () async {
                               if (_addformKey.currentState!.validate()) {
-                                // TODO: Add company
+                                setState(() {
+                                  _loading = true;
+                                });
+                                Company company = Company(
+                                  name: _nameController.text,
+                                  phone: _phoneController.text,
+                                  email: _emailController.text,
+                                  website: _websiteController.text,
+                                );
+                                var resp = await _companyAPI.post(
+                                  companyUrl,
+                                  body: company.toJson(),
+                                );
+                                if (resp['status'] == "success") {
+                                  showSnackBar(context, Colors.green,
+                                      "Company created successfully", 300);
+                                  Navigator.pop(context);
+                                } else {
+                                  showSnackBar(context, Colors.red,
+                                      "Failed to create company", 300);
+                                }
                               }
                             },
                             label: const Text("Save"),
-                            icon: const Icon(Icons.done),
+                            icon: _loading
+                                ? const CircularProgressIndicator.adaptive()
+                                : const Icon(Icons.save),
                           )
                         ],
                       ),
@@ -137,6 +168,7 @@ class _CompanyHomeState extends State<CompanyHome> {
             Company comp = snapshot.data!['companies'].first;
 
             return Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Container(
                   margin: const EdgeInsets.all(8),
@@ -148,56 +180,41 @@ class _CompanyHomeState extends State<CompanyHome> {
                         style: const TextStyle(
                             fontWeight: FontWeight.bold, fontSize: 30),
                       ),
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          ElevatedButton.icon(
-                            onPressed: () {
-                              setState(() {
-                                _enabled = true;
-                              });
-                            },
-                            label: const Text("Edit"),
-                            icon: const Icon(Icons.edit),
-                          ),
-                          const SizedBox(
-                            width: 5,
-                          ),
-                          _enabled
-                              ? ElevatedButton.icon(
-                                  onPressed: () {},
-                                  label: const Text("Save"),
-                                  icon: const Icon(Icons.done),
-                                )
-                              : const SizedBox()
-                        ],
-                      )
                     ],
                   ),
                 ),
-                Card(
-                  child: Form(
-                    key: _formKey,
-                    child: Column(
-                      children: [
-                        TextFormField(
-                          initialValue: comp.name,
-                          enabled: _enabled,
-                          decoration: const InputDecoration(),
-                        ),
-                      ],
-                    ),
+                const SizedBox(
+                  height: 10,
+                ),
+                // logo will be here
+                Container(
+                  margin: const EdgeInsets.all(8),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        comp.phone ?? '',
+                        style: const TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 20),
+                      ),
+                    ],
                   ),
-                )
+                ),
               ],
             );
           }
         }
-        if (snapshot.hasError) {
-          return const Text("An error occurred");
-        }
 
-        return const Text("An unknown error occurred");
+        return const Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.error,
+              color: Colors.red,
+            ),
+            Text("An error occurred"),
+          ],
+        );
       },
     );
   }
