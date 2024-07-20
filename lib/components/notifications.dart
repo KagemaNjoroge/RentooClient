@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../utils/notifications.dart';
+import '../constants.dart';
+import '../sdk/notifications.dart';
 
 class NotificationsModal extends StatefulWidget {
   const NotificationsModal({super.key});
@@ -10,10 +11,11 @@ class NotificationsModal extends StatefulWidget {
 }
 
 class _NotificationsModalState extends State<NotificationsModal> {
+  final NotificationsAPI _notificationsAPI = NotificationsAPI();
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: fetchNotifications(),
+      future: _notificationsAPI.get(notificationsUrl),
       builder: (context, snapshot) {
         if (snapshot.hasError) {
           return const Row(
