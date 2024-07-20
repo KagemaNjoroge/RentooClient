@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:rentoo_pms/sdk/property.dart';
 
 import '../../constants.dart';
-import '../../utils/property.dart';
 
 class PropertyHome extends StatefulWidget {
   const PropertyHome({super.key});
@@ -11,6 +11,7 @@ class PropertyHome extends StatefulWidget {
 }
 
 class _PropertyHomeState extends State<PropertyHome> {
+  final PropertyAPI _propertyAPI = PropertyAPI();
   // controller for the add property modal
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _addressController = TextEditingController();
@@ -237,7 +238,7 @@ class _PropertyHomeState extends State<PropertyHome> {
                 return const Center(
                     child: CircularProgressIndicator.adaptive());
               },
-              future: fetchProperty(),
+              future: _propertyAPI.get(propertyUrl),
             )),
           ),
         ),
