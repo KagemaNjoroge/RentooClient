@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../utils/tenants.dart';
+import '../../constants.dart';
+import '../../sdk/tenants.dart';
 
 class TenantSelector extends StatefulWidget {
   const TenantSelector({super.key, required Function callback});
@@ -10,10 +11,11 @@ class TenantSelector extends StatefulWidget {
 }
 
 class _TenantSelectorState extends State<TenantSelector> {
+  final TenantsAPI _tenantsAPI = TenantsAPI();
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: fetchTenants(),
+      future: _tenantsAPI.get(tenantsUrl),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.done &&
             snapshot.hasData) {
