@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:rentoo_pms/constants.dart';
 
-import '../../utils/property.dart';
+import '../../sdk/property.dart';
+
 
 class PropertySelector extends StatefulWidget {
   const PropertySelector({super.key});
@@ -10,10 +12,11 @@ class PropertySelector extends StatefulWidget {
 }
 
 class _PropertySelectorState extends State<PropertySelector> {
+    final PropertyAPI _propertyAPI = PropertyAPI();
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: fetchProperty(),
+      future: _propertyAPI.get(propertyUrl),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.done &&
             snapshot.hasData) {
