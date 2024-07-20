@@ -25,7 +25,7 @@ class LeasesAPI implements BaseApi {
         throw DioException(
           requestOptions: response.requestOptions,
           response: response,
-          error: "Failed to load companies",
+          error: "Failed to load leases",
         );
       }
     } catch (e) {
