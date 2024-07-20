@@ -177,12 +177,13 @@ class _TenantsHomeState extends State<TenantsHome> {
               return Expanded(
                 child: ListView.builder(
                   itemBuilder: (context, index) {
+                    var tenant = snapshot.data!['tenants'][index];
                     return ListTile(
                       onTap: () {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                            content: Text(
-                                "${snapshot.data!['tenants'][index].firstName}"),
+                            content:
+                                Text("${tenant.firstName} ${tenant.lastName}"),
                             behavior: SnackBarBehavior.floating,
                             width: 300,
                             backgroundColor: Colors.green,
@@ -195,8 +196,10 @@ class _TenantsHomeState extends State<TenantsHome> {
                           ),
                         );
                       },
-                      leading: const CircleAvatar(
-                        child: FlutterLogo(),
+                      leading: CircleAvatar(
+                        backgroundImage: tenant.photo != null
+                            ? NetworkImage(tenant.photo!)
+                            : const AssetImage("assets/images/user_avatar.png"),
                       ),
                       title:
                           Text("${snapshot.data!['tenants'][index].firstName}"),

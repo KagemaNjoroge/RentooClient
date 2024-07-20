@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:rentoo_pms/utils/leases.dart';
 
+import '../../constants.dart';
+import '../../sdk/leases.dart';
 import '../common/tenant_selector.dart';
 
 class PaymentsHome extends StatefulWidget {
@@ -13,6 +14,7 @@ class PaymentsHome extends StatefulWidget {
 var lease = 0;
 
 class _PaymentsHomeState extends State<PaymentsHome> {
+  final LeasesAPI _leasesAPI = LeasesAPI();
   Widget addPaymentModal() {
     return Container(
       padding: const EdgeInsets.all(20),
@@ -33,7 +35,7 @@ class _PaymentsHomeState extends State<PaymentsHome> {
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               FutureBuilder(
-                future: fetchLeases(),
+                future: _leasesAPI.get(leasesUrl),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.done &&
                       snapshot.hasData) {

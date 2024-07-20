@@ -11,11 +11,11 @@ class HouseSelector extends StatefulWidget {
 }
 
 class _HouseSelectorState extends State<HouseSelector> {
-  final PropertyAPI _propertyAPI = PropertyAPI();
+  final HousesAPI _housesAPI = HousesAPI();
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: _propertyAPI.get(housesUrl),
+      future: _housesAPI.get(housesUrl),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.done &&
             snapshot.hasData) {

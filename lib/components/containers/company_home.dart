@@ -153,13 +153,13 @@ class _CompanyHomeState extends State<CompanyHome> {
                             label: const Text("Save"),
                             icon: _loading
                                 ? const CircularProgressIndicator.adaptive()
-                                : const Icon(Icons.save),
+                                : const Icon(Icons.done),
                           )
                         ],
                       ),
                     );
                   },
-                  icon: const Icon(Icons.add),
+                  icon: const Icon(Icons.settings),
                   label: const Text("Configure company"),
                 )
               ],

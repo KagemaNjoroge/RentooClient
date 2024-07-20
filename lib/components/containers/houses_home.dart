@@ -182,29 +182,51 @@ class _HousesHomeState extends State<HousesHome> {
                   if (snapshot.connectionState == ConnectionState.done &&
                       snapshot.hasData) {
                     List houses = snapshot.data!['houses'];
-                    return DataTable(
-                      showCheckboxColumn: true,
-                      onSelectAll: (value) {},
-                      columns: const [
-                        DataColumn(label: Text("House Number")),
-                        DataColumn(label: Text("Property")),
-                        DataColumn(label: Text("Rent")),
-                        DataColumn(label: Text("Purpose")),
-                      ],
-                      rows: houses
-                          .map(
-                            (e) => DataRow(
-                              onSelectChanged: (value) {},
-                              cells: [
-                                DataCell(Text(e.houseNumber.toString())),
-                                DataCell(Text(e.property.toString())),
-                                DataCell(Text(e.rent.toString())),
-                                DataCell(Text(e.purpose.toString())),
+                    if (houses.isEmpty) {
+                      return Center(
+                        child: Column(
+                          children: [
+                            const Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(Icons.warning, color: Colors.red),
+                                Text("No houses found"),
                               ],
                             ),
-                          )
-                          .toList(),
-                    );
+                            const SizedBox(height: 20),
+                            ElevatedButton.icon(
+                              onPressed: () {},
+                              icon: const Icon(Icons.add),
+                              label: const Text("Add House"),
+                            ),
+                          ],
+                        ),
+                      );
+                    } else {
+                      return DataTable(
+                        showCheckboxColumn: true,
+                        onSelectAll: (value) {},
+                        columns: const [
+                          DataColumn(label: Text("House Number")),
+                          DataColumn(label: Text("Property")),
+                          DataColumn(label: Text("Rent")),
+                          DataColumn(label: Text("Purpose")),
+                        ],
+                        rows: houses
+                            .map(
+                              (e) => DataRow(
+                                onSelectChanged: (value) {},
+                                cells: [
+                                  DataCell(Text(e.houseNumber.toString())),
+                                  DataCell(Text(e.property.toString())),
+                                  DataCell(Text(e.rent.toString())),
+                                  DataCell(Text(e.purpose.toString())),
+                                ],
+                              ),
+                            )
+                            .toList(),
+                      );
+                    }
                   }
                   return const Center(
                     child: CircularProgressIndicator.adaptive(),

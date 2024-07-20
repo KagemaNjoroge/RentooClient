@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../utils/leases.dart';
+import '../../constants.dart';
+import '../../sdk/leases.dart';
 import '../common/house_selector.dart';
 import '../common/tenant_selector.dart';
 
@@ -12,6 +13,7 @@ class LeasesHome extends StatefulWidget {
 }
 
 class _LeasesHomeState extends State<LeasesHome> {
+  final LeasesAPI _leasesAPI = LeasesAPI();
   Widget _gap() {
     return const SizedBox(
       height: 10,
@@ -130,7 +132,7 @@ class _LeasesHomeState extends State<LeasesHome> {
           ),
         ),
         FutureBuilder(
-          future: fetchLeases(),
+          future: _leasesAPI.get(leasesUrl),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Column(
