@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:rentoo_pms/pages/login.dart';
 
 import '../components/containers/communication.dart';
 import '../components/containers/company_home.dart';
@@ -101,7 +102,13 @@ class _HomeState extends State<Home> {
                 tooltip: "Logout",
                 icon: const Icon(Icons.logout),
                 onPressed: () {
-                  //TODO: logout user
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) {
+                        return const LoginPage();
+                      },
+                    ),
+                  );
                 },
               ),
               leading: IconButton(
