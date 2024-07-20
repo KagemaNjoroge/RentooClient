@@ -127,9 +127,15 @@ class CompanyAPI implements BaseApi {
       if (e.response != null) {
         message = e.response?.data.toString();
       }
-      return message;
+      return {
+        "status": "error",
+        "message": message,
+      };
     } else {
-      return "Unexpected error occurred";
+      return {
+        "status": "error",
+        "message": e.toString(),
+      };
     }
   }
 }
