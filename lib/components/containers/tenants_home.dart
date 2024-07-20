@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../utils/tenants.dart';
+import '../../constants.dart';
+import '../../sdk/tenants.dart';
 
 class TenantsHome extends StatefulWidget {
   const TenantsHome({super.key});
@@ -82,6 +83,7 @@ Widget _addTenantModal() {
 }
 
 class _TenantsHomeState extends State<TenantsHome> {
+  final TenantsAPI _tenantsAPI = TenantsAPI();
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -155,7 +157,7 @@ class _TenantsHomeState extends State<TenantsHome> {
           height: 20,
         ),
         FutureBuilder(
-          future: fetchTenants(),
+          future: _tenantsAPI.get(tenantsUrl),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Column(
