@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../constants.dart';
-import '../../utils/property.dart';
+import '../../sdk/property.dart';
 import '../common/property_selector.dart';
 
 class HousesHome extends StatefulWidget {
@@ -12,6 +12,7 @@ class HousesHome extends StatefulWidget {
 }
 
 class _HousesHomeState extends State<HousesHome> {
+  final HousesAPI _housesAPI = HousesAPI();
   // controller for the add house modal house number, property, rent, purpose, description,
   final TextEditingController _houseNumberController = TextEditingController();
   final TextEditingController _rentController = TextEditingController();
@@ -170,46 +171,47 @@ class _HousesHomeState extends State<HousesHome> {
             margin: const EdgeInsets.all(8),
             width: double.infinity,
             child: SingleChildScrollView(
-                child: FutureBuilder(
-              future: fetchHouses(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
+              child: FutureBuilder(
+                future: _housesAPI.get(housesUrl),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(
+                      child: CircularProgressIndicator.adaptive(),
+                    );
+                  }
+                  if (snapshot.connectionState == ConnectionState.done &&
+                      snapshot.hasData) {
+                    List houses = snapshot.data!['houses'];
+                    return DataTable(
+                      showCheckboxColumn: true,
+                      onSelectAll: (value) {},
+                      columns: const [
+                        DataColumn(label: Text("House Number")),
+                        DataColumn(label: Text("Property")),
+                        DataColumn(label: Text("Rent")),
+                        DataColumn(label: Text("Purpose")),
+                      ],
+                      rows: houses
+                          .map(
+                            (e) => DataRow(
+                              onSelectChanged: (value) {},
+                              cells: [
+                                DataCell(Text(e.houseNumber.toString())),
+                                DataCell(Text(e.property.toString())),
+                                DataCell(Text(e.rent.toString())),
+                                DataCell(Text(e.purpose.toString())),
+                              ],
+                            ),
+                          )
+                          .toList(),
+                    );
+                  }
                   return const Center(
                     child: CircularProgressIndicator.adaptive(),
                   );
-                }
-                if (snapshot.connectionState == ConnectionState.done &&
-                    snapshot.hasData) {
-                  List houses = snapshot.data!['houses'];
-                  return DataTable(
-                    showCheckboxColumn: true,
-                    onSelectAll: (value) {},
-                    columns: const [
-                      DataColumn(label: Text("House Number")),
-                      DataColumn(label: Text("Property")),
-                      DataColumn(label: Text("Rent")),
-                      DataColumn(label: Text("Purpose")),
-                    ],
-                    rows: houses
-                        .map(
-                          (e) => DataRow(
-                            onSelectChanged: (value) {},
-                            cells: [
-                              DataCell(Text(e.houseNumber.toString())),
-                              DataCell(Text(e.property.toString())),
-                              DataCell(Text(e.rent.toString())),
-                              DataCell(Text(e.purpose.toString())),
-                            ],
-                          ),
-                        )
-                        .toList(),
-                  );
-                }
-                return const Center(
-                  child: CircularProgressIndicator.adaptive(),
-                );
-              },
-            )),
+                },
+              ),
+            ),
           ),
         )
       ],
