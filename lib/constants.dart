@@ -28,21 +28,32 @@ const String applicationLegalese =
     "Brought to you by the good folks at TomorrowAI";
 const String applicationVersion = "0.1.0";
 
-// endpoints
-// const companyUrl = "http://localhost:8000/company/";
-// const propertyUrl = "http://localhost:8000/properties/";
-// const housesUrl = "http://localhost:8000/houses/";
-// const tenantsUrl = "http://localhost:8000/tenants";
-// const leasesUrl = "http://localhost:8000/leases/";
-// const notificationsUrl = "http://localhost:8000/notifications/";
-// const unitsUrl = 'http://localhost:8000/units/';
-// const agentsUrl = "http://localhost:8000/agents/";
+const tenantTypes = [
+  {
+    "name": "Individual",
+    "value": "Individual",
+  },
+  {
+    "name": "Business",
+    "value": "Business",
+  },
+];
 
-const companyUrl = "http://192.168.137.1:8000/company/";
-const propertyUrl = "http://192.168.137.1:8000/properties/";
-const housesUrl = "http://192.168.137.1:8000/houses/";
-const tenantsUrl = "http://192.168.137.1:8000/tenants";
-const leasesUrl = "http://192.168.137.1:8000/leases/";
-const notificationsUrl = "http://192.168.137.1:8000/notifications/";
-const unitsUrl = 'http://192.168.137.1:8000/units/';
-const agentsUrl = "http://192.168.137.1:8000/agents/";
+//endpoints
+const companyUrl = "http://localhost:8000/company/";
+const propertyUrl = "http://localhost:8000/properties/";
+const housesUrl = "http://localhost:8000/houses/";
+const tenantsUrl = "http://localhost:8000/tenants";
+const leasesUrl = "http://localhost:8000/leases/";
+const notificationsUrl = "http://localhost:8000/notifications/";
+const unitsUrl = 'http://localhost:8000/units/';
+const agentsUrl = "http://localhost:8000/agents/";
+
+// const companyUrl = "http://192.168.137.1:8000/company/";
+// const propertyUrl = "http://192.168.137.1:8000/properties/";
+// const housesUrl = "http://192.168.137.1:8000/houses/";
+// const tenantsUrl = "http://192.168.137.1:8000/tenants";
+// const leasesUrl = "http://192.168.137.1:8000/leases/";
+// const notificationsUrl = "http://192.168.137.1:8000/notifications/";
+// const unitsUrl = 'http://192.168.137.1:8000/units/';
+// const agentsUrl = "http://192.168.137.1:8000/agents/";
