@@ -38,6 +38,7 @@ class LeasesAPI implements BaseApi {
       {Map<String, dynamic>? body}) async {
     try {
       final response = await _dio.post(url, data: body);
+      print(response.data);
       if (response.statusCode == 201) {
         return {
           "status": "success",
