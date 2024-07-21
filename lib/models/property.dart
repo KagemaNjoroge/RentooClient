@@ -6,6 +6,7 @@ class Property {
   DateTime? createdAt;
   DateTime? updatedAt;
   List<dynamic>? photos;
+  String? purpose;
 
   Property({
     this.id,
@@ -15,6 +16,7 @@ class Property {
     this.createdAt,
     this.updatedAt,
     this.photos,
+    this.purpose,
   });
 
   Property.fromJson(Map<String, dynamic> json) {
@@ -25,6 +27,7 @@ class Property {
     createdAt = DateTime.parse(json['created_at']);
     updatedAt = DateTime.parse(json['updated_at']);
     photos = json['photos'];
+    purpose = json['purpose'];
   }
 
   Map<String, dynamic> toJson() {
@@ -35,7 +38,8 @@ class Property {
       "description": description,
       "created_at": createdAt,
       "updated_at": updatedAt,
-      "photos": photos
+      "photos": photos,
+      "purpose": purpose,
     };
   }
 }
