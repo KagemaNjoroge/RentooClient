@@ -8,3 +8,14 @@ class Gap extends StatelessWidget {
     return const SizedBox(height: 20);
   }
 }
+
+class HorizontalGap extends StatelessWidget {
+  const HorizontalGap({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const SizedBox(
+      width: 10,
+    );
+  }
+}
