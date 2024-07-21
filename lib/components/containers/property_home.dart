@@ -92,6 +92,36 @@ class _PropertyHomeState extends State<PropertyHome> {
               icon: Icon(Icons.description),
             ),
           ),
+          _gap,
+          Row(
+            children: [
+              TextButton.icon(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                icon: const Icon(Icons.close),
+                label: const Text("Close"),
+              ),
+              TextButton.icon(
+                onPressed: () {
+                  if (_formKey.currentState!.validate()) {
+                    Navigator.pop(context);
+                    // show snackbar
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text("Property added"),
+                        behavior: SnackBarBehavior.floating,
+                        backgroundColor: Colors.green,
+                        width: 200,
+                      ),
+                    );
+                  }
+                },
+                icon: const Icon(Icons.done),
+                label: const Text("Save"),
+              ),
+            ],
+          )
         ],
       ),
     );
@@ -121,42 +151,34 @@ class _PropertyHomeState extends State<PropertyHome> {
                 children: [
                   ElevatedButton.icon(
                     onPressed: () {
-                      showDialog(
-                        context: context,
-                        builder: (context) {
-                          return AlertDialog(
-                            title: const Text("Add Property"),
-                            content: addPropertyModal(),
-                            actions: [
-                              TextButton.icon(
-                                onPressed: () {
-                                  Navigator.pop(context);
-                                },
-                                icon: const Icon(Icons.close),
-                                label: const Text("Close"),
+                      showBottomSheet(
+                          context: context,
+                          builder: (context) {
+                            return Container(
+                              padding: const EdgeInsets.all(20),
+                              decoration: const BoxDecoration(
+                                border: Border(
+                                  top: BorderSide(
+                                    color: Colors.grey,
+                                    width: 1,
+                                  ),
+                                  left: BorderSide(
+                                    color: Colors.grey,
+                                    width: 1,
+                                  ),
+                                  right: BorderSide(
+                                    color: Colors.grey,
+                                    width: 1,
+                                  ),
+                                ),
+                                borderRadius: BorderRadius.only(
+                                  topLeft: Radius.circular(20),
+                                  topRight: Radius.circular(20),
+                                ),
                               ),
-                              TextButton.icon(
-                                onPressed: () {
-                                  if (_formKey.currentState!.validate()) {
-                                    Navigator.pop(context);
-                                    // show snackbar
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        content: Text("Property added"),
-                                        behavior: SnackBarBehavior.floating,
-                                        backgroundColor: Colors.green,
-                                        width: 200,
-                                      ),
-                                    );
-                                  }
-                                },
-                                icon: const Icon(Icons.done),
-                                label: const Text("Save"),
-                              ),
-                            ],
-                          );
-                        },
-                      );
+                              child: addPropertyModal(),
+                            );
+                          });
                     },
                     label: const Text("Add Property"),
                     icon: const Icon(Icons.add),
