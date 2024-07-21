@@ -1,18 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:rentoo_pms/components/common/gap.dart';
+import 'package:rentoo_pms/utils/snack.dart';
 
 import '../../constants.dart';
+import '../../models/house.dart';
 import '../../sdk/property.dart';
-import '../common/property_selector.dart';
 
-class HousesHome extends StatefulWidget {
-  const HousesHome({super.key});
+class AddHouseBottomSheet extends StatefulWidget {
+  const AddHouseBottomSheet({super.key});
 
   @override
-  State<HousesHome> createState() => _HousesHomeState();
+  State<AddHouseBottomSheet> createState() => _AddHouseBottomSheetState();
 }
 
-class _HousesHomeState extends State<HousesHome> {
+class _AddHouseBottomSheetState extends State<AddHouseBottomSheet> {
+  final PropertyAPI _propertyAPI = PropertyAPI();
   final HousesAPI _housesAPI = HousesAPI();
   // controller for the add house modal house number, property, rent, purpose, description,
   final TextEditingController _houseNumberController = TextEditingController();
@@ -21,9 +23,11 @@ class _HousesHomeState extends State<HousesHome> {
   final TextEditingController _descriptionController = TextEditingController();
   // keys
   final _formKey = GlobalKey<FormState>();
-
-  final Widget _gap = const SizedBox(height: 20);
-  Widget addHouseModal() {
+  // state
+  bool _isLoading = false;
+  int _property = 0;
+  @override
+  Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: const BoxDecoration(
@@ -53,14 +57,46 @@ class _HousesHomeState extends State<HousesHome> {
           children: [
             Container(
               padding: const EdgeInsets.all(8),
-              child: const Column(
+              child: Column(
                 children: [
-                  Text("At which property is the house located in?*"),
-                  PropertySelector(),
+                  const Text("At which property is the house located in?*"),
+                  FutureBuilder(
+                    future: _propertyAPI.get(propertyUrl),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.done &&
+                          snapshot.hasData) {
+                        List property = snapshot.data!['property'];
+                        List<DropdownMenuItem> items = [];
+                        for (var t in property) {
+                          items.add(DropdownMenuItem(
+                            value: t.id,
+                            child: Text("${t.name}"),
+                          ));
+                        }
+
+                        return DropdownButtonFormField(
+                          validator: (value) {
+                            if (value == null) {
+                              return "You must select a property";
+                            }
+                            return null;
+                          },
+                          icon: const Icon(Icons.apartment),
+                          items: items,
+                          onChanged: (val) {
+                            _property = val as int;
+                          },
+                          hint: const Text("Property"),
+                        );
+                      }
+
+                      return const CircularProgressIndicator.adaptive();
+                    },
+                  )
                 ],
               ),
             ),
-            _gap,
+            const Gap(),
             TextFormField(
               validator: (value) {
                 if (value!.isEmpty) {
@@ -74,7 +110,7 @@ class _HousesHomeState extends State<HousesHome> {
                 labelText: "House Number*",
               ),
             ),
-            _gap,
+            const Gap(),
             TextFormField(
               validator: (value) {
                 if (value!.isEmpty) {
@@ -88,7 +124,7 @@ class _HousesHomeState extends State<HousesHome> {
                 labelText: "Rent*",
               ),
             ),
-            _gap,
+            const Gap(),
             DropdownButtonFormField(
               validator: (value) {
                 if (value == null) {
@@ -112,7 +148,7 @@ class _HousesHomeState extends State<HousesHome> {
                 labelText: "Purpose",
               ),
             ),
-            _gap,
+            const Gap(),
             TextFormField(
               controller: _descriptionController,
               minLines: 3,
@@ -133,22 +169,55 @@ class _HousesHomeState extends State<HousesHome> {
                   label: const Text("Cancel"),
                 ),
                 TextButton.icon(
-                  onPressed: () {
+                  onPressed: () async {
                     if (_formKey.currentState!.validate()) {
                       // save house
-                      Navigator.pop(context);
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text("House saved"),
-                          behavior: SnackBarBehavior.floating,
-                          width: 200,
-                          backgroundColor: Colors.green,
-                        ),
+                      House house = House(
+                        houseNumber: _houseNumberController.text,
+                        description: _descriptionController.text,
+                        property: _property,
+                        rent: double.parse(_rentController.text),
+                        purpose: _purposeController.text,
+                        isOccupied: false,
+                        photos: [],
+                        numberOfBedrooms: 1,
+                        numberOfRooms: 1,
                       );
+                      setState(() {
+                        _isLoading = true;
+                      });
+                      try {
+                        var response = await _housesAPI.post(housesUrl,
+                            body: house.toJson());
+                        if (response['status'] == 'success') {
+                          showSnackBar(context, Colors.green,
+                              "House saved successfully", 300);
+                          Navigator.pop(context);
+                          setState(() {
+                            _houseNumberController.clear();
+                            _rentController.clear();
+                            _descriptionController.clear();
+                            _purposeController.clear();
+                            _property = 0;
+                          });
+                        }
+                      } catch (e) {
+                        showSnackBar(context, Colors.red, e.toString(), 600);
+                      } finally {
+                        setState(() {
+                          _isLoading = false;
+                        });
+                      }
                     }
                   },
                   icon: const Icon(Icons.done),
-                  label: const Text("Save"),
+                  label: _isLoading
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator.adaptive(),
+                        )
+                      : const Text("Save"),
                 ),
               ],
             )
@@ -157,6 +226,17 @@ class _HousesHomeState extends State<HousesHome> {
       ),
     );
   }
+}
+
+class HousesHome extends StatefulWidget {
+  const HousesHome({super.key});
+
+  @override
+  State<HousesHome> createState() => _HousesHomeState();
+}
+
+class _HousesHomeState extends State<HousesHome> {
+  final HousesAPI _housesAPI = HousesAPI();
 
   @override
   Widget build(BuildContext context) {
@@ -179,7 +259,7 @@ class _HousesHomeState extends State<HousesHome> {
                 onPressed: () {
                   showBottomSheet(
                     context: context,
-                    builder: (context) => addHouseModal(),
+                    builder: (context) => const AddHouseBottomSheet(),
                   );
                 },
                 icon: const Icon(Icons.add),
@@ -227,7 +307,8 @@ class _HousesHomeState extends State<HousesHome> {
                               onPressed: () {
                                 showBottomSheet(
                                   context: context,
-                                  builder: (context) => addHouseModal(),
+                                  builder: (context) =>
+                                      const AddHouseBottomSheet(),
                                 );
                               },
                               icon: const Icon(Icons.add),
