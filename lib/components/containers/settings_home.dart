@@ -88,6 +88,46 @@ class _SettingHomeState extends State<SettingHome> {
     }
   ];
 
+  // dummy users
+  final List _users = [
+    {
+      "firstName": "John",
+      "lastName": "Doe",
+      "email": "johndoe@example.com",
+      "role": "Admin",
+    },
+    {
+      "firstName": "Jane",
+      "lastName": "Doe",
+      "email": "janedoe@example.com",
+      "role": "User",
+    },
+    {
+      "firstName": "Alice",
+      "lastName": "Doe",
+      "email": "alicedoe@gmail.com",
+      "role": "User",
+    },
+    {
+      "firstName": "John",
+      "lastName": "Doe",
+      "email": "johndoe@example.com",
+      "role": "Admin",
+    },
+    {
+      "firstName": "Jane",
+      "lastName": "Doe",
+      "email": "janedoe@example.com",
+      "role": "User",
+    },
+    {
+      "firstName": "Alice",
+      "lastName": "Doe",
+      "email": "alicedoe@gmail.com",
+      "role": "User",
+    },
+  ];
+
   // controllers& keys
   final GlobalKey<FormState> _formKey = GlobalKey();
   final TextEditingController _companyNameController = TextEditingController();
@@ -403,6 +443,40 @@ class _SettingHomeState extends State<SettingHome> {
                               ),
                             ),
                           ],
+                        ),
+                        // users table
+                        Expanded(
+                          child: SingleChildScrollView(
+                            child: DataTable(columns: const [
+                              DataColumn(label: Text("First Name")),
+                              DataColumn(label: Text("Last Name")),
+                              DataColumn(label: Text("Email")),
+                              DataColumn(label: Text("Role")),
+                              DataColumn(label: Text("Actions")),
+                            ], rows: [
+                              for (var user in _users)
+                                DataRow(cells: [
+                                  DataCell(Text(user["firstName"])),
+                                  DataCell(Text(user["lastName"])),
+                                  DataCell(Text(user["email"])),
+                                  DataCell(Text(user["role"])),
+                                  DataCell(
+                                    Row(
+                                      children: [
+                                        IconButton(
+                                          icon: const Icon(Icons.edit),
+                                          onPressed: () {},
+                                        ),
+                                        IconButton(
+                                          icon: const Icon(Icons.delete),
+                                          onPressed: () {},
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ]),
+                            ]),
+                          ),
                         )
                       ],
                     ),
