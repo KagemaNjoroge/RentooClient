@@ -9,6 +9,8 @@ class Tenant {
   String? photo;
   String? website;
   List<dynamic>? houses;
+  // default type is individual
+  String? type = "Individual";
 
   Tenant({
     this.createdAt,
@@ -21,6 +23,7 @@ class Tenant {
     this.photo,
     this.updatedAt,
     this.website,
+    this.type,
   });
   Tenant.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -33,6 +36,7 @@ class Tenant {
     photo = json['photo'];
     website = json['website'];
     phoneNumber = json['phone_number'];
+    type = json['tenant_type'];
   }
   Map<String, dynamic> toJson() {
     return {
@@ -46,6 +50,7 @@ class Tenant {
       "photo": photo,
       "website": website,
       "phone_number": phoneNumber,
+      "tenant_type": type,
     };
   }
 }
