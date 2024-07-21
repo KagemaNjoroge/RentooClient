@@ -29,40 +29,96 @@ class _LeasesHomeState extends State<LeasesHome> {
 
   Widget _addLeaseModal() {
     bool renew = false;
-    return Form(
-      key: _formKey,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          TextFormField(
-            controller: _startDateController,
-            onTap: () async {
-              var start = await showDateRangePicker(
-                  context: context,
-                  firstDate: DateTime.now(),
-                  lastDate: DateTime(2050));
-              setState(() {
-                _startDateController.text = start.toString();
-              });
-            },
-            decoration: const InputDecoration(
-              labelText: "Start Date",
-            ),
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: const BoxDecoration(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(20),
+          topRight: Radius.circular(20),
+        ),
+        border: Border(
+          top: BorderSide(
+            color: Colors.grey,
+            width: 1,
           ),
-          _gap(),
-          _gap(),
-          TenantSelector(callback: () {}),
-          _gap(),
-          const HouseSelector(),
-          _gap(),
-          SwitchListTile(
-            value: renew,
-            onChanged: (value) {
-              renew = value;
-            },
-            title: const Text("Renew Monthly"),
-          )
-        ],
+          left: BorderSide(
+            color: Colors.grey,
+            width: 1,
+          ),
+          right: BorderSide(
+            color: Colors.grey,
+            width: 1,
+          ),
+        ),
+      ),
+      child: Form(
+        key: _formKey,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextFormField(
+              controller: _startDateController,
+              onTap: () async {
+                var start = await showDateRangePicker(
+                    context: context,
+                    firstDate: DateTime.now(),
+                    lastDate: DateTime(2050));
+                setState(() {
+                  _startDateController.text = start.toString();
+                });
+              },
+              decoration: const InputDecoration(
+                labelText: "Start Date",
+              ),
+            ),
+            _gap(),
+            _gap(),
+            TenantSelector(callback: () {}),
+            _gap(),
+            const HouseSelector(),
+            _gap(),
+            SwitchListTile(
+              value: renew,
+              onChanged: (value) {
+                renew = value;
+              },
+              title: const Text("Renew Monthly"),
+            ),
+            _gap(),
+            Row(
+              children: [
+                TextButton.icon(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  label: const Text("Close"),
+                  icon: const Icon(Icons.close),
+                ),
+                TextButton.icon(
+                  onPressed: () {
+                    if (_formKey.currentState!.validate()) {
+                      if (_renewMonthly) {
+                        _renewMonthly = false;
+                      }
+                      // add lease
+                      Navigator.pop(context);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text("Lease added"),
+                          behavior: SnackBarBehavior.floating,
+                          backgroundColor: Colors.green,
+                          width: 200,
+                        ),
+                      );
+                    }
+                  },
+                  label: const Text("Save"),
+                  icon: const Icon(Icons.done),
+                ),
+              ],
+            )
+          ],
+        ),
       ),
     );
   }
@@ -85,44 +141,9 @@ class _LeasesHomeState extends State<LeasesHome> {
               ),
               ElevatedButton.icon(
                 onPressed: () {
-                  showDialog(
+                  showBottomSheet(
                     context: context,
-                    builder: (context) {
-                      return AlertDialog(
-                        title: const Text("Add Lease"),
-                        content: _addLeaseModal(),
-                        actions: [
-                          TextButton.icon(
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                            label: const Text("Close"),
-                            icon: const Icon(Icons.close),
-                          ),
-                          TextButton.icon(
-                            onPressed: () {
-                              if (_formKey.currentState!.validate()) {
-                                if (_renewMonthly) {
-                                  _renewMonthly = false;
-                                }
-                                // add lease
-                                Navigator.pop(context);
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text("Lease added"),
-                                    behavior: SnackBarBehavior.floating,
-                                    backgroundColor: Colors.green,
-                                    width: 200,
-                                  ),
-                                );
-                              }
-                            },
-                            label: const Text("Save"),
-                            icon: const Icon(Icons.done),
-                          ),
-                        ],
-                      );
-                    },
+                    builder: (context) => _addLeaseModal(),
                   );
                 },
                 label: const Text("Add Lease"),
