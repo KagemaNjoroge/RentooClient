@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:rentoo_pms/utils/snack.dart';
 
 import '../../constants.dart';
 import '../../models/tenant.dart';
@@ -12,6 +13,7 @@ class TenantsHome extends StatefulWidget {
 }
 
 class _TenantsHomeState extends State<TenantsHome> {
+  bool _isLoading = false;
   Widget _gap() {
     return const SizedBox(
       height: 10,
@@ -47,139 +49,180 @@ class _TenantsHomeState extends State<TenantsHome> {
   final GlobalKey<FormState> _formKey = GlobalKey();
 
   Widget _addTenantModal() {
-    return Form(
-      key: _formKey,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          DropdownButtonFormField(
-            items: _tenantsTypes(),
-            onChanged: (value) {
-              setState(() {
-                tenant_type = value.toString();
-              });
-            },
-            decoration: const InputDecoration(
-              border: UnderlineInputBorder(),
-              hintText: "Tenant Type",
-            ),
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: const BoxDecoration(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(20),
+          topRight: Radius.circular(20),
+        ),
+        border: Border(
+          top: BorderSide(
+            color: Colors.grey,
+            width: 1,
           ),
-          _gap(),
-          Row(
-            children: [
-              Expanded(
-                child: TextFormField(
-                  keyboardType: TextInputType.name,
-                  controller: _firstNameController,
-                  validator: (value) {
-                    if (value!.isEmpty) {
-                      return "First Name is required";
-                    }
-                    return null;
-                  },
-                  decoration: const InputDecoration(
-                      prefixIcon: Icon(Icons.person),
-                      border: UnderlineInputBorder(),
-                      hintText: "First Name"),
-                ),
-              ),
-              _horizontalGap(),
-              Expanded(
-                child: TextFormField(
-                  validator: (value) {
-                    if (value!.isEmpty) {
-                      return "Last Name is required";
-                    }
-                    return null;
-                  },
-                  controller: _lastNameController,
-                  keyboardType: TextInputType.name,
-                  decoration: const InputDecoration(
-                      prefixIcon: Icon(Icons.person),
-                      border: UnderlineInputBorder(),
-                      hintText: "Last Name"),
-                ),
-              ),
-            ],
+          left: BorderSide(
+            color: Colors.grey,
+            width: 1,
           ),
-          _gap(),
-          Row(
-            children: [
-              Expanded(
-                child: TextFormField(
-                  controller: _phoneController,
-                  keyboardType: TextInputType.phone,
-                  decoration: const InputDecoration(
-                      prefixIcon: Icon(Icons.phone),
-                      border: UnderlineInputBorder(),
-                      hintText: "Phone Number"),
-                ),
-              ),
-              _horizontalGap(),
-              Expanded(
-                child: TextFormField(
-                  keyboardType: TextInputType.emailAddress,
-                  controller: _emailController,
-                  decoration: const InputDecoration(
-                      prefixIcon: Icon(Icons.email),
-                      border: UnderlineInputBorder(),
-                      hintText: "Email"),
-                ),
-              ),
-            ],
+          right: BorderSide(
+            color: Colors.grey,
+            width: 1,
           ),
-          _gap(),
-          TextFormField(
-            controller: _websiteController,
-            keyboardType: TextInputType.url,
-            decoration: const InputDecoration(
-                prefixIcon: Icon(Icons.language),
+        ),
+      ),
+      child: Form(
+        key: _formKey,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            DropdownButtonFormField(
+              items: _tenantsTypes(),
+              onChanged: (value) {
+                setState(() {
+                  tenant_type = value.toString();
+                });
+              },
+              decoration: const InputDecoration(
                 border: UnderlineInputBorder(),
-                hintText: "Website"),
-          ),
-          _gap(),
-          Row(
-            children: [
-              TextButton.icon(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                label: const Text("Close"),
-                icon: const Icon(Icons.close),
+                hintText: "Tenant Type",
               ),
-              TextButton.icon(
-                onPressed: () async {
-                  if (_formKey.currentState!.validate()) {
-                    Tenant tenant = Tenant(
-                      firstName: _firstNameController.text,
-                      lastName: _lastNameController.text,
-                      email: _emailController.text,
-                      phoneNumber: _phoneController.text,
-                      type: tenant_type,
-                      website: _websiteController.text,
-                    );
-                    // save
-                    await Future.delayed(
-                      const Duration(seconds: 3),
-                      () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text("Tenant added successfully"),
-                            behavior: SnackBarBehavior.floating,
-                            width: 300,
-                          ),
-                        );
-                        Navigator.pop(context);
-                      },
-                    );
-                  }
-                },
-                label: const Text("Save"),
-                icon: const Icon(Icons.done),
-              ),
-            ],
-          ),
-        ],
+            ),
+            _gap(),
+            Row(
+              children: [
+                Expanded(
+                  child: TextFormField(
+                    keyboardType: TextInputType.name,
+                    controller: _firstNameController,
+                    validator: (value) {
+                      if (value!.isEmpty) {
+                        return "First Name is required";
+                      }
+                      return null;
+                    },
+                    decoration: const InputDecoration(
+                        prefixIcon: Icon(Icons.person),
+                        border: UnderlineInputBorder(),
+                        hintText: "First Name"),
+                  ),
+                ),
+                _horizontalGap(),
+                Expanded(
+                  child: TextFormField(
+                    validator: (value) {
+                      if (value!.isEmpty) {
+                        return "Last Name is required";
+                      }
+                      return null;
+                    },
+                    controller: _lastNameController,
+                    keyboardType: TextInputType.name,
+                    decoration: const InputDecoration(
+                        prefixIcon: Icon(Icons.person),
+                        border: UnderlineInputBorder(),
+                        hintText: "Last Name"),
+                  ),
+                ),
+              ],
+            ),
+            _gap(),
+            Row(
+              children: [
+                Expanded(
+                  child: TextFormField(
+                    controller: _phoneController,
+                    keyboardType: TextInputType.phone,
+                    decoration: const InputDecoration(
+                        prefixIcon: Icon(Icons.phone),
+                        border: UnderlineInputBorder(),
+                        hintText: "Phone Number"),
+                  ),
+                ),
+                _horizontalGap(),
+                Expanded(
+                  child: TextFormField(
+                    keyboardType: TextInputType.emailAddress,
+                    controller: _emailController,
+                    decoration: const InputDecoration(
+                        prefixIcon: Icon(Icons.email),
+                        border: UnderlineInputBorder(),
+                        hintText: "Email"),
+                  ),
+                ),
+              ],
+            ),
+            _gap(),
+            TextFormField(
+              controller: _websiteController,
+              keyboardType: TextInputType.url,
+              decoration: const InputDecoration(
+                  prefixIcon: Icon(Icons.language),
+                  border: UnderlineInputBorder(),
+                  hintText: "Website"),
+            ),
+            _gap(),
+            Row(
+              children: [
+                TextButton.icon(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  label: const Text("Close"),
+                  icon: const Icon(Icons.close),
+                ),
+                TextButton.icon(
+                  onPressed: () async {
+                    if (_formKey.currentState!.validate()) {
+                      Tenant tenant = Tenant(
+                        firstName: _firstNameController.text,
+                        lastName: _lastNameController.text,
+                        email: _emailController.text,
+                        phoneNumber: _phoneController.text,
+                        type: tenant_type,
+                        website: _websiteController.text,
+                        houses: [],
+                      );
+                      // save
+                      setState(() {
+                        _isLoading = true;
+                      });
+                      try {
+                        var response = await _tenantsAPI.post(tenantsUrl,
+                            body: tenant.toJson());
+                        if (response['status'] == "success") {
+                          showSnackBar(context, Colors.green,
+                              "Tenant added successfully", 300);
+                          // clear fields
+                          _firstNameController.clear();
+                          _lastNameController.clear();
+                          _emailController.clear();
+                          _phoneController.clear();
+                          _websiteController.clear();
+                        } else {
+                          showSnackBar(
+                              context, Colors.red, "An error occurred", 300);
+                        }
+                        setState(() {
+                          _isLoading = false;
+                        });
+                      } catch (e) {
+                        showSnackBar(context, Colors.red, e.toString(), 300);
+                        setState(() {
+                          _isLoading = false;
+                        });
+                      }
+                    }
+                  },
+                  label: _isLoading
+                      ? const CircularProgressIndicator.adaptive()
+                      : const Text("Save"),
+                  icon: const Icon(Icons.done),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
