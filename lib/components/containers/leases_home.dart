@@ -1,34 +1,38 @@
 import 'package:flutter/material.dart';
 
 import '../../constants.dart';
+import '../../models/lease.dart';
 import '../../sdk/leases.dart';
-import '../common/house_selector.dart';
-import '../common/tenant_selector.dart';
+import '../../sdk/property.dart';
+import '../../sdk/tenants.dart';
+import '../../utils/snack.dart';
+import '../common/gap.dart';
 
-class LeasesHome extends StatefulWidget {
-  const LeasesHome({super.key});
+class AddLeasesBottomSheet extends StatefulWidget {
+  const AddLeasesBottomSheet({super.key});
 
   @override
-  State<LeasesHome> createState() => _LeasesHomeState();
+  State<AddLeasesBottomSheet> createState() => _AddLeasesBottomSheetState();
 }
 
-class _LeasesHomeState extends State<LeasesHome> {
+class _AddLeasesBottomSheetState extends State<AddLeasesBottomSheet> {
   final LeasesAPI _leasesAPI = LeasesAPI();
-  Widget _gap() {
-    return const SizedBox(
-      height: 10,
-    );
-  }
-
+  final HousesAPI _housesAPI = HousesAPI();
+  final TenantsAPI _tenantsAPI = TenantsAPI();
+  bool _renewMonthly = true;
+  int _houseId = 0;
+  int _tenantId = 0;
+  DateTime _startDate = DateTime.now();
+  DateTime _endDate = DateTime.now();
   // keys
   final GlobalKey<FormState> _formKey = GlobalKey();
   // controllers
   final TextEditingController _startDateController = TextEditingController();
 
-  bool _renewMonthly = true;
-
-  Widget _addLeaseModal() {
-    bool renew = false;
+  // state
+  bool _isLoading = false;
+  @override
+  Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: const BoxDecoration(
@@ -63,28 +67,100 @@ class _LeasesHomeState extends State<LeasesHome> {
                     context: context,
                     firstDate: DateTime.now(),
                     lastDate: DateTime(2050));
-                setState(() {
-                  _startDateController.text = start.toString();
-                });
+                _startDateController.text = start.toString();
+                if (start != null) {
+                  _startDate = DateTime(
+                      start.start.year, start.start.month, start.start.day);
+                  _endDate =
+                      DateTime(start.end.year, start.end.month, start.end.day);
+                }
               },
               decoration: const InputDecoration(
                 labelText: "Start Date",
               ),
             ),
-            _gap(),
-            _gap(),
-            TenantSelector(callback: () {}),
-            _gap(),
-            const HouseSelector(),
-            _gap(),
+            const Gap(),
+            const Gap(),
+            FutureBuilder(
+              future: _tenantsAPI.get(tenantsUrl),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.done &&
+                    snapshot.hasData) {
+                  List tenants = snapshot.data!['tenants'];
+                  List<DropdownMenuItem> items = [];
+                  for (var t in tenants) {
+                    items.add(
+                      DropdownMenuItem(
+                        value: t.id,
+                        child: Text("${t.firstName} ${t.lastName}"),
+                      ),
+                    );
+                  }
+
+                  return DropdownButtonFormField(
+                    validator: (value) {
+                      if (value == null) {
+                        return "Please select a tenant";
+                      }
+                      return null;
+                    },
+                    icon: const Icon(Icons.person),
+                    items: items,
+                    onChanged: (val) {
+                      _tenantId = val as int;
+                    },
+                    hint: const Text("Tenant"),
+                  );
+                }
+
+                return const CircularProgressIndicator.adaptive();
+              },
+            ),
+            const Gap(),
+            FutureBuilder(
+              future: _housesAPI.get(housesUrl),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.done &&
+                    snapshot.hasData) {
+                  List houses = snapshot.data!['houses'];
+                  List<DropdownMenuItem> items = [];
+                  for (var t in houses) {
+                    items.add(
+                      DropdownMenuItem(
+                        value: t.id,
+                        child: Text("${t.houseNumber}"),
+                      ),
+                    );
+                  }
+
+                  return DropdownButtonFormField(
+                    validator: (value) {
+                      if (value == null) {
+                        return "Please select a house";
+                      }
+                      return null;
+                    },
+                    icon: const Icon(Icons.bungalow),
+                    items: items,
+                    onChanged: (val) {
+                      _houseId = val as int;
+                    },
+                    hint: const Text("House"),
+                  );
+                }
+
+                return const CircularProgressIndicator.adaptive();
+              },
+            ),
+            const Gap(),
             SwitchListTile(
-              value: renew,
+              value: _renewMonthly,
               onChanged: (value) {
-                renew = value;
+                _renewMonthly = value;
               },
               title: const Text("Renew Monthly"),
             ),
-            _gap(),
+            const Gap(),
             Row(
               children: [
                 TextButton.icon(
@@ -95,24 +171,47 @@ class _LeasesHomeState extends State<LeasesHome> {
                   icon: const Icon(Icons.close),
                 ),
                 TextButton.icon(
-                  onPressed: () {
+                  onPressed: () async {
                     if (_formKey.currentState!.validate()) {
-                      if (_renewMonthly) {
-                        _renewMonthly = false;
-                      }
-                      // add lease
-                      Navigator.pop(context);
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text("Lease added"),
-                          behavior: SnackBarBehavior.floating,
-                          backgroundColor: Colors.green,
-                          width: 200,
-                        ),
+                      print("House id: $_houseId");
+                      print("Tenant id: $_tenantId");
+                      Lease lease = Lease(
+                        house: _houseId,
+                        tenant: _tenantId,
+                        startDate: _startDate,
+                        endDate: _endDate,
+                        renewMonthly: _renewMonthly,
+                        depositAmount: 0,
+                        isActive: true,
                       );
+                      print(lease.toJson());
+                      setState(() {
+                        _isLoading = true;
+                      });
+                      try {
+                        var response = await _leasesAPI.post(leasesUrl,
+                            body: lease.toJson());
+
+                        if (response['status'] == 'success') {
+                          showSnackBar(context, Colors.green,
+                              "Lease created successfully", 300);
+                          Navigator.pop(context);
+                        } else {
+                          showSnackBar(
+                              context, Colors.red, "An error occurred", 300);
+                        }
+                      } catch (e) {
+                        showSnackBar(context, Colors.red, e.toString(), 600);
+                      } finally {
+                        setState(() {
+                          _isLoading = false;
+                        });
+                      }
                     }
                   },
-                  label: const Text("Save"),
+                  label: _isLoading
+                      ? const CircularProgressIndicator.adaptive()
+                      : const Text("Save"),
                   icon: const Icon(Icons.done),
                 ),
               ],
@@ -122,6 +221,17 @@ class _LeasesHomeState extends State<LeasesHome> {
       ),
     );
   }
+}
+
+class LeasesHome extends StatefulWidget {
+  const LeasesHome({super.key});
+
+  @override
+  State<LeasesHome> createState() => _LeasesHomeState();
+}
+
+class _LeasesHomeState extends State<LeasesHome> {
+  final LeasesAPI _leasesAPI = LeasesAPI();
 
   @override
   Widget build(BuildContext context) {
@@ -143,7 +253,7 @@ class _LeasesHomeState extends State<LeasesHome> {
                 onPressed: () {
                   showBottomSheet(
                     context: context,
-                    builder: (context) => _addLeaseModal(),
+                    builder: (context) => const AddLeasesBottomSheet(),
                   );
                 },
                 label: const Text("Add Lease"),
