@@ -20,6 +20,7 @@ class _PropertyHomeState extends State<PropertyHome> {
   // keys
   final _formKey = GlobalKey<FormState>();
   final Widget _gap = const SizedBox(height: 20);
+  final bool _propertyExists = true;
 
   Widget addPropertyModal() {
     // name, address, description
@@ -115,47 +116,69 @@ class _PropertyHomeState extends State<PropertyHome> {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              ElevatedButton.icon(
-                onPressed: () {
-                  showDialog(
-                    context: context,
-                    builder: (context) {
-                      return AlertDialog(
-                        title: const Text("Add Property"),
-                        content: addPropertyModal(),
-                        actions: [
-                          TextButton.icon(
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                            icon: const Icon(Icons.close),
-                            label: const Text("Close"),
-                          ),
-                          TextButton.icon(
-                            onPressed: () {
-                              if (_formKey.currentState!.validate()) {
-                                Navigator.pop(context);
-                                // show snackbar
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text("Property added"),
-                                    behavior: SnackBarBehavior.floating,
-                                    backgroundColor: Colors.green,
-                                    width: 200,
-                                  ),
-                                );
-                              }
-                            },
-                            icon: const Icon(Icons.done),
-                            label: const Text("Save"),
-                          ),
-                        ],
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  ElevatedButton.icon(
+                    onPressed: () {
+                      showDialog(
+                        context: context,
+                        builder: (context) {
+                          return AlertDialog(
+                            title: const Text("Add Property"),
+                            content: addPropertyModal(),
+                            actions: [
+                              TextButton.icon(
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                                icon: const Icon(Icons.close),
+                                label: const Text("Close"),
+                              ),
+                              TextButton.icon(
+                                onPressed: () {
+                                  if (_formKey.currentState!.validate()) {
+                                    Navigator.pop(context);
+                                    // show snackbar
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text("Property added"),
+                                        behavior: SnackBarBehavior.floating,
+                                        backgroundColor: Colors.green,
+                                        width: 200,
+                                      ),
+                                    );
+                                  }
+                                },
+                                icon: const Icon(Icons.done),
+                                label: const Text("Save"),
+                              ),
+                            ],
+                          );
+                        },
                       );
                     },
-                  );
-                },
-                label: const Text("Add Property"),
-                icon: const Icon(Icons.add),
+                    label: const Text("Add Property"),
+                    icon: const Icon(Icons.add),
+                  ),
+                  // excel, pdf
+                  const SizedBox(width: 10),
+                  _propertyExists
+                      ? IconButton(
+                          tooltip: "Download as Excel",
+                          onPressed: () {},
+                          icon: const Icon(Icons.download),
+                        )
+                      : const SizedBox(),
+                  const SizedBox(width: 10),
+                  _propertyExists
+                      ? IconButton(
+                          tooltip: "Download as PDF",
+                          onPressed: () {},
+                          icon: const Icon(Icons.picture_as_pdf),
+                        )
+                      : const SizedBox(),
+                ],
               ),
             ],
           ),
@@ -181,6 +204,7 @@ class _PropertyHomeState extends State<PropertyHome> {
                 if (snapshot.connectionState == ConnectionState.done &&
                     snapshot.hasData) {
                   var props = snapshot.data!['property'];
+
                   return DataTable(
                     columns: const [
                       DataColumn(label: Text("Name")),
