@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../constants.dart';
+import '../../models/tenant.dart';
 import '../../sdk/tenants.dart';
 
 class TenantsHome extends StatefulWidget {
@@ -10,79 +11,179 @@ class TenantsHome extends StatefulWidget {
   State<TenantsHome> createState() => _TenantsHomeState();
 }
 
-Widget _gap() {
-  return const SizedBox(
-    height: 10,
-  );
-}
+class _TenantsHomeState extends State<TenantsHome> {
+  Widget _gap() {
+    return const SizedBox(
+      height: 10,
+    );
+  }
+
+  Widget _horizontalGap() {
+    return const SizedBox(
+      width: 10,
+    );
+  }
+
+  List<DropdownMenuItem> _tenantsTypes() {
+    return tenantTypes
+        .map(
+          (e) => DropdownMenuItem(
+            value: e['value'],
+            child: Text(e['name']!),
+          ),
+        )
+        .toList();
+  }
+
+  String tenant_type = "Individual";
 
 // controllers
-TextEditingController _firstNameController = TextEditingController();
-TextEditingController _lastNameController = TextEditingController();
-TextEditingController _emailController = TextEditingController();
-TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _firstNameController = TextEditingController();
+  final TextEditingController _lastNameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _websiteController = TextEditingController();
 // keys
-GlobalKey<FormState> _formKey = GlobalKey();
+  final GlobalKey<FormState> _formKey = GlobalKey();
 
-Widget _addTenantModal() {
-  return Form(
-    key: _formKey,
-    child: Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        TextFormField(
-          keyboardType: TextInputType.name,
-          controller: _firstNameController,
-          validator: (value) {
-            if (value!.isEmpty) {
-              return "First Name is required";
-            }
-            return null;
-          },
-          decoration: const InputDecoration(
-              prefixIcon: Icon(Icons.person),
+  Widget _addTenantModal() {
+    return Form(
+      key: _formKey,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          DropdownButtonFormField(
+            items: _tenantsTypes(),
+            onChanged: (value) {
+              setState(() {
+                tenant_type = value.toString();
+              });
+            },
+            decoration: const InputDecoration(
               border: UnderlineInputBorder(),
-              hintText: "First Name"),
-        ),
-        _gap(),
-        TextFormField(
-          validator: (value) {
-            if (value!.isEmpty) {
-              return "Last Name is required";
-            }
-            return null;
-          },
-          controller: _lastNameController,
-          keyboardType: TextInputType.name,
-          decoration: const InputDecoration(
-              prefixIcon: Icon(Icons.person),
-              border: UnderlineInputBorder(),
-              hintText: "Last Name"),
-        ),
-        _gap(),
-        TextFormField(
-          controller: _phoneController,
-          keyboardType: TextInputType.phone,
-          decoration: const InputDecoration(
-              prefixIcon: Icon(Icons.phone),
-              border: UnderlineInputBorder(),
-              hintText: "Phone Number"),
-        ),
-        _gap(),
-        TextFormField(
-          keyboardType: TextInputType.emailAddress,
-          controller: _emailController,
-          decoration: const InputDecoration(
-              prefixIcon: Icon(Icons.email),
-              border: UnderlineInputBorder(),
-              hintText: "Email"),
-        ),
-      ],
-    ),
-  );
-}
+              hintText: "Tenant Type",
+            ),
+          ),
+          _gap(),
+          Row(
+            children: [
+              Expanded(
+                child: TextFormField(
+                  keyboardType: TextInputType.name,
+                  controller: _firstNameController,
+                  validator: (value) {
+                    if (value!.isEmpty) {
+                      return "First Name is required";
+                    }
+                    return null;
+                  },
+                  decoration: const InputDecoration(
+                      prefixIcon: Icon(Icons.person),
+                      border: UnderlineInputBorder(),
+                      hintText: "First Name"),
+                ),
+              ),
+              _horizontalGap(),
+              Expanded(
+                child: TextFormField(
+                  validator: (value) {
+                    if (value!.isEmpty) {
+                      return "Last Name is required";
+                    }
+                    return null;
+                  },
+                  controller: _lastNameController,
+                  keyboardType: TextInputType.name,
+                  decoration: const InputDecoration(
+                      prefixIcon: Icon(Icons.person),
+                      border: UnderlineInputBorder(),
+                      hintText: "Last Name"),
+                ),
+              ),
+            ],
+          ),
+          _gap(),
+          Row(
+            children: [
+              Expanded(
+                child: TextFormField(
+                  controller: _phoneController,
+                  keyboardType: TextInputType.phone,
+                  decoration: const InputDecoration(
+                      prefixIcon: Icon(Icons.phone),
+                      border: UnderlineInputBorder(),
+                      hintText: "Phone Number"),
+                ),
+              ),
+              _horizontalGap(),
+              Expanded(
+                child: TextFormField(
+                  keyboardType: TextInputType.emailAddress,
+                  controller: _emailController,
+                  decoration: const InputDecoration(
+                      prefixIcon: Icon(Icons.email),
+                      border: UnderlineInputBorder(),
+                      hintText: "Email"),
+                ),
+              ),
+            ],
+          ),
+          _gap(),
+          TextFormField(
+            controller: _websiteController,
+            keyboardType: TextInputType.url,
+            decoration: const InputDecoration(
+                prefixIcon: Icon(Icons.language),
+                border: UnderlineInputBorder(),
+                hintText: "Website"),
+          ),
+          _gap(),
+          Row(
+            children: [
+              TextButton.icon(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                label: const Text("Close"),
+                icon: const Icon(Icons.close),
+              ),
+              TextButton.icon(
+                onPressed: () async {
+                  if (_formKey.currentState!.validate()) {
+                    Tenant tenant = Tenant(
+                      firstName: _firstNameController.text,
+                      lastName: _lastNameController.text,
+                      email: _emailController.text,
+                      phoneNumber: _phoneController.text,
+                      type: tenant_type,
+                      website: _websiteController.text,
+                    );
+                    // save
+                    await Future.delayed(
+                      const Duration(seconds: 3),
+                      () {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text("Tenant added successfully"),
+                            behavior: SnackBarBehavior.floating,
+                            width: 300,
+                          ),
+                        );
+                        Navigator.pop(context);
+                      },
+                    );
+                  }
+                },
+                label: const Text("Save"),
+                icon: const Icon(Icons.done),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
 
-class _TenantsHomeState extends State<TenantsHome> {
   final TenantsAPI _tenantsAPI = TenantsAPI();
   @override
   Widget build(BuildContext context) {
@@ -103,50 +204,11 @@ class _TenantsHomeState extends State<TenantsHome> {
               ),
               ElevatedButton.icon(
                   onPressed: () {
-                    showDialog(
-                      context: context,
-                      builder: (context) {
-                        return AlertDialog(
-                          title: const Center(
-                            child: Text("Add new tenant"),
-                          ),
-                          content: _addTenantModal(),
-                          actions: [
-                            TextButton.icon(
-                              onPressed: () {
-                                Navigator.pop(context);
-                              },
-                              label: const Text("Close"),
-                              icon: const Icon(Icons.close),
-                            ),
-                            TextButton.icon(
-                              onPressed: () async {
-                                if (_formKey.currentState!.validate()) {
-                                  // save
-                                  await Future.delayed(
-                                    const Duration(seconds: 3),
-                                    () {
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        const SnackBar(
-                                          content:
-                                              Text("Tenant added successfully"),
-                                          behavior: SnackBarBehavior.floating,
-                                          width: 300,
-                                        ),
-                                      );
-                                      Navigator.pop(context);
-                                    },
-                                  );
-                                }
-                              },
-                              label: const Text("Save"),
-                              icon: const Icon(Icons.done),
-                            ),
-                          ],
-                        );
-                      },
-                    );
+                    showBottomSheet(
+                        context: context,
+                        builder: (context) {
+                          return _addTenantModal();
+                        });
                   },
                   label: const Text("Add Tenant"),
                   icon: const Icon(Icons.add)),
