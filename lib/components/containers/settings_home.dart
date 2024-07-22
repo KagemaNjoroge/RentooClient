@@ -3,131 +3,14 @@ import 'package:provider/provider.dart';
 
 import '../../providers/brightness.dart';
 
-class SettingHome extends StatefulWidget {
-  const SettingHome({super.key});
+class SystemSettingsTab extends StatefulWidget {
+  const SystemSettingsTab({super.key});
 
   @override
-  State<SettingHome> createState() => _SettingHomeState();
+  State<SystemSettingsTab> createState() => _SystemSettingsTabState();
 }
 
-class _SettingHomeState extends State<SettingHome> {
-  final List _supportedLanguages = ["English", "Swahili"];
-  final List _currencies = ["USD", "KES", "EUR", "GBP"];
-
-  // dummy payment methods
-  final List _paymentMethods = [
-    {
-      "type": "Mpesa",
-      "description": "Mpesa payment method",
-      "logo":
-          "https://play-lh.googleusercontent.com/bRZF74-13jknePwUd1xam5ZCSdAJVuI_wqtkrisBgu7EEh1jobh2boZihlk-4ikY_S3V",
-      "name": "Mpesa",
-    },
-    {
-      "type": "Paypal",
-      "description": "Paypal payment method",
-      "logo":
-          "https://play-lh.googleusercontent.com/bRZF74-13jknePwUd1xam5ZCSdAJVuI_wqtkrisBgu7EEh1jobh2boZihlk-4ikY_S3V",
-      "name": "Paypal",
-    },
-    {
-      "type": "Visa",
-      "description": "Visa payment method",
-      "logo":
-          "https://play-lh.googleusercontent.com/bRZF74-13jknePwUd1xam5ZCSdAJVuI_wqtkrisBgu7EEh1jobh2boZihlk-4ikY_S3V",
-      "name": "Visa",
-    },
-    {
-      "type": "Mastercard",
-      "description": "Mastercard payment method",
-      "logo":
-          "https://play-lh.googleusercontent.com/bRZF74-13jknePwUd1xam5ZCSdAJVuI_wqtkrisBgu7EEh1jobh2boZihlk-4ikY_S3V",
-      "name": "Mastercard",
-    },
-    {
-      "type": "American Express",
-      "description": "American Express payment method",
-      "logo":
-          "https://play-lh.googleusercontent.com/bRZF74-13jknePwUd1xam5ZCSdAJVuI_wqtkrisBgu7EEh1jobh2boZihlk-4ikY_S3V",
-      "name": "American Express",
-    },
-    {
-      "type": "Discover",
-      "description": "Discover payment method",
-      "logo":
-          "https://play-lh.googleusercontent.com/bRZF74-13jknePwUd1xam5ZCSdAJVuI_wqtkrisBgu7EEh1jobh2boZihlk-4ikY_S3V",
-      "name": "Discover",
-    },
-    {
-      "type": "Stripe",
-      "description": "Stripe payment method",
-      "logo":
-          "https://play-lh.googleusercontent.com/bRZF74-13jknePwUd1xam5ZCSdAJVuI_wqtkrisBgu7EEh1jobh2boZihlk-4ikY_S3V",
-      "name": "Stripe",
-    },
-    {
-      "type": "Cash",
-      "description": "Cash payment method",
-      "logo":
-          "https://play-lh.googleusercontent.com/bRZF74-13jknePwUd1xam5ZCSdAJVuI_wqtkrisBgu7EEh1jobh2boZihlk-4ikY_S3V",
-      "name": "Cash",
-    },
-    {
-      "type": "Bank Transfer",
-      "description": "Bank Transfer payment method",
-      "logo":
-          "https://play-lh.googleusercontent.com/bRZF74-13jknePwUd1xam5ZCSdAJVuI_wqtkrisBgu7EEh1jobh2boZihlk-4ikY_S3V",
-      "name": "Bank Transfer",
-    },
-    {
-      "type": "Cheque",
-      "description": "Cheque payment method",
-      "logo":
-          "https://play-lh.googleusercontent.com/bRZF74-13jknePwUd1xam5ZCSdAJVuI_wqtkrisBgu7EEh1jobh2boZihlk-4ikY_S3V",
-      "name": "Cheque",
-    }
-  ];
-
-  // dummy users
-  final List _users = [
-    {
-      "firstName": "John",
-      "lastName": "Doe",
-      "email": "johndoe@example.com",
-      "role": "Admin",
-    },
-    {
-      "firstName": "Jane",
-      "lastName": "Doe",
-      "email": "janedoe@example.com",
-      "role": "User",
-    },
-    {
-      "firstName": "Alice",
-      "lastName": "Doe",
-      "email": "alicedoe@gmail.com",
-      "role": "User",
-    },
-    {
-      "firstName": "John",
-      "lastName": "Doe",
-      "email": "johndoe@example.com",
-      "role": "Admin",
-    },
-    {
-      "firstName": "Jane",
-      "lastName": "Doe",
-      "email": "janedoe@example.com",
-      "role": "User",
-    },
-    {
-      "firstName": "Alice",
-      "lastName": "Doe",
-      "email": "alicedoe@gmail.com",
-      "role": "User",
-    },
-  ];
-
+class _SystemSettingsTabState extends State<SystemSettingsTab> {
   // controllers& keys
   final GlobalKey<FormState> _formKey = GlobalKey();
   final TextEditingController _companyNameController = TextEditingController();
@@ -135,7 +18,8 @@ class _SettingHomeState extends State<SettingHome> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _websiteController = TextEditingController();
   final TextEditingController _logoController = TextEditingController();
-
+  final List _supportedLanguages = ["English", "Swahili"];
+  final List _currencies = ["USD", "KES", "EUR", "GBP"];
   List<DropdownMenuItem> _getDropdownItems(List items) {
     List<DropdownMenuItem> dropdownItems = [];
     for (var item in items) {
@@ -147,7 +31,8 @@ class _SettingHomeState extends State<SettingHome> {
     return dropdownItems;
   }
 
-  Widget _systemSettings() {
+  @override
+  Widget build(BuildContext context) {
     return Card(
       margin: const EdgeInsets.all(8),
       child: Column(
@@ -267,8 +152,167 @@ class _SettingHomeState extends State<SettingHome> {
       ),
     );
   }
+}
 
-  Widget _paymentSettings() {
+class SettingHome extends StatefulWidget {
+  const SettingHome({super.key});
+
+  @override
+  State<SettingHome> createState() => _SettingHomeState();
+}
+
+class _SettingHomeState extends State<SettingHome> {
+  @override
+  Widget build(BuildContext context) {
+    return const Expanded(
+      child: DefaultTabController(
+        length: 4,
+        child: Column(
+          children: [
+            SizedBox(
+              height: 10,
+            ),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.settings),
+                SizedBox(
+                  width: 10,
+                ),
+                Text(
+                  "Settings",
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                ),
+              ],
+            ),
+
+            // tabs for payment, system,users&roles, notifications
+            Expanded(
+              child: TabBar(
+                tabAlignment: TabAlignment.start,
+                isScrollable: true,
+                tabs: [
+                  Tab(
+                    icon: Icon(Icons.settings),
+                    text: "System",
+                  ),
+                  Tab(
+                    icon: Icon(Icons.payment),
+                    text: "Payments",
+                  ),
+                  Tab(
+                    icon: Icon(Icons.people),
+                    text: "Users & Roles",
+                  ),
+                  Tab(
+                    icon: Icon(Icons.notifications),
+                    text: "Notifications",
+                  ),
+                ],
+              ),
+            ),
+            // tab views
+            Expanded(
+              flex: 5,
+              child: TabBarView(
+                children: [
+                  SystemSettingsTab(),
+                  PaymentSettingsTab(),
+                  UserSettingsTab(),
+                  NotificationSettingsTab(),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class PaymentSettingsTab extends StatefulWidget {
+  const PaymentSettingsTab({super.key});
+
+  @override
+  State<PaymentSettingsTab> createState() => _PaymentSettingsTabState();
+}
+
+class _PaymentSettingsTabState extends State<PaymentSettingsTab> {
+  // dummy payment methods
+  final List _paymentMethods = [
+    {
+      "type": "Mpesa",
+      "description": "Mpesa payment method",
+      "logo":
+          "https://play-lh.googleusercontent.com/bRZF74-13jknePwUd1xam5ZCSdAJVuI_wqtkrisBgu7EEh1jobh2boZihlk-4ikY_S3V",
+      "name": "Mpesa",
+    },
+    {
+      "type": "Paypal",
+      "description": "Paypal payment method",
+      "logo":
+          "https://play-lh.googleusercontent.com/bRZF74-13jknePwUd1xam5ZCSdAJVuI_wqtkrisBgu7EEh1jobh2boZihlk-4ikY_S3V",
+      "name": "Paypal",
+    },
+    {
+      "type": "Visa",
+      "description": "Visa payment method",
+      "logo":
+          "https://play-lh.googleusercontent.com/bRZF74-13jknePwUd1xam5ZCSdAJVuI_wqtkrisBgu7EEh1jobh2boZihlk-4ikY_S3V",
+      "name": "Visa",
+    },
+    {
+      "type": "Mastercard",
+      "description": "Mastercard payment method",
+      "logo":
+          "https://play-lh.googleusercontent.com/bRZF74-13jknePwUd1xam5ZCSdAJVuI_wqtkrisBgu7EEh1jobh2boZihlk-4ikY_S3V",
+      "name": "Mastercard",
+    },
+    {
+      "type": "American Express",
+      "description": "American Express payment method",
+      "logo":
+          "https://play-lh.googleusercontent.com/bRZF74-13jknePwUd1xam5ZCSdAJVuI_wqtkrisBgu7EEh1jobh2boZihlk-4ikY_S3V",
+      "name": "American Express",
+    },
+    {
+      "type": "Discover",
+      "description": "Discover payment method",
+      "logo":
+          "https://play-lh.googleusercontent.com/bRZF74-13jknePwUd1xam5ZCSdAJVuI_wqtkrisBgu7EEh1jobh2boZihlk-4ikY_S3V",
+      "name": "Discover",
+    },
+    {
+      "type": "Stripe",
+      "description": "Stripe payment method",
+      "logo":
+          "https://play-lh.googleusercontent.com/bRZF74-13jknePwUd1xam5ZCSdAJVuI_wqtkrisBgu7EEh1jobh2boZihlk-4ikY_S3V",
+      "name": "Stripe",
+    },
+    {
+      "type": "Cash",
+      "description": "Cash payment method",
+      "logo":
+          "https://play-lh.googleusercontent.com/bRZF74-13jknePwUd1xam5ZCSdAJVuI_wqtkrisBgu7EEh1jobh2boZihlk-4ikY_S3V",
+      "name": "Cash",
+    },
+    {
+      "type": "Bank Transfer",
+      "description": "Bank Transfer payment method",
+      "logo":
+          "https://play-lh.googleusercontent.com/bRZF74-13jknePwUd1xam5ZCSdAJVuI_wqtkrisBgu7EEh1jobh2boZihlk-4ikY_S3V",
+      "name": "Bank Transfer",
+    },
+    {
+      "type": "Cheque",
+      "description": "Cheque payment method",
+      "logo":
+          "https://play-lh.googleusercontent.com/bRZF74-13jknePwUd1xam5ZCSdAJVuI_wqtkrisBgu7EEh1jobh2boZihlk-4ikY_S3V",
+      "name": "Cheque",
+    }
+  ];
+  @override
+  Widget build(BuildContext context) {
     return Card(
       margin: const EdgeInsets.all(8),
       child: Column(
@@ -354,165 +398,167 @@ class _SettingHomeState extends State<SettingHome> {
       ),
     );
   }
+}
+
+class NotificationSettingsTab extends StatefulWidget {
+  const NotificationSettingsTab({super.key});
 
   @override
+  State<NotificationSettingsTab> createState() =>
+      _NotificationSettingsTabState();
+}
+
+class _NotificationSettingsTabState extends State<NotificationSettingsTab> {
+  @override
   Widget build(BuildContext context) {
-    return Expanded(
-      child: DefaultTabController(
-        length: 4,
-        child: Column(
-          children: [
-            const SizedBox(
-              height: 10,
+    return Card(
+      margin: const EdgeInsets.all(8),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Text(
+            "Notification settings",
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 20,
             ),
-            const Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(Icons.settings),
-                SizedBox(
-                  width: 10,
-                ),
-                Text(
-                  "Settings",
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
-                ),
-              ],
-            ),
+          ),
+          SwitchListTile(
+            value: false,
+            onChanged: (val) {},
+            title: const Text("Rent Payment"),
+          ),
+          SwitchListTile(
+            value: false,
+            onChanged: (val) {},
+            title: const Text("Maintenance Requests"),
+          ),
+          SwitchListTile(
+            value: false,
+            onChanged: (val) {},
+            title: const Text("System upgrade"),
+          ),
+        ],
+      ),
+    );
+  }
+}
 
-            // tabs for payment, system,users&roles, notifications
-            const Expanded(
-              child: TabBar(
-                tabAlignment: TabAlignment.start,
-                isScrollable: true,
-                tabs: [
-                  Tab(
-                    icon: Icon(Icons.settings),
-                    text: "System",
-                  ),
-                  Tab(
-                    icon: Icon(Icons.payment),
-                    text: "Payments",
-                  ),
-                  Tab(
-                    icon: Icon(Icons.people),
-                    text: "Users & Roles",
-                  ),
-                  Tab(
-                    icon: Icon(Icons.notifications),
-                    text: "Notifications",
-                  ),
-                ],
+class UserSettingsTab extends StatefulWidget {
+  const UserSettingsTab({super.key});
+
+  @override
+  State<UserSettingsTab> createState() => _UserSettingsTabState();
+}
+
+class _UserSettingsTabState extends State<UserSettingsTab> {
+  // dummy users
+  final List _users = [
+    {
+      "firstName": "John",
+      "lastName": "Doe",
+      "email": "johndoe@example.com",
+      "role": "Admin",
+    },
+    {
+      "firstName": "Jane",
+      "lastName": "Doe",
+      "email": "janedoe@example.com",
+      "role": "User",
+    },
+    {
+      "firstName": "Alice",
+      "lastName": "Doe",
+      "email": "alicedoe@gmail.com",
+      "role": "User",
+    },
+    {
+      "firstName": "John",
+      "lastName": "Doe",
+      "email": "johndoe@example.com",
+      "role": "Admin",
+    },
+    {
+      "firstName": "Jane",
+      "lastName": "Doe",
+      "email": "janedoe@example.com",
+      "role": "User",
+    },
+    {
+      "firstName": "Alice",
+      "lastName": "Doe",
+      "email": "alicedoe@gmail.com",
+      "role": "User",
+    },
+  ];
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      margin: const EdgeInsets.all(8),
+      child: Column(
+        children: [
+          const Text("Users & Roles settings"),
+          const SizedBox(
+            height: 20,
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              ElevatedButton.icon(
+                onPressed: () {},
+                icon: const Icon(Icons.add),
+                label: const Text("Add User"),
               ),
-            ),
-            // tab views
-            Expanded(
-              flex: 5,
-              child: TabBarView(
-                children: [
-                  _systemSettings(),
-                  _paymentSettings(),
-
-                  // users and roles
-                  Card(
-                    margin: const EdgeInsets.all(8),
-                    child: Column(
-                      children: [
-                        const Text("Users & Roles settings"),
-                        const SizedBox(
-                          height: 20,
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            ElevatedButton.icon(
-                              onPressed: () {},
-                              icon: const Icon(Icons.add),
-                              label: const Text("Add User"),
-                            ),
-                            Container(
-                              margin: const EdgeInsets.all(8),
-                              height: 50,
-                              width: 300,
-                              child: const Expanded(
-                                child: TextField(
-                                  decoration: InputDecoration(
-                                    hintText: "Search",
-                                    prefixIcon: Icon(Icons.search),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        // users table
-                        Expanded(
-                          child: SingleChildScrollView(
-                            child: DataTable(columns: const [
-                              DataColumn(label: Text("First Name")),
-                              DataColumn(label: Text("Last Name")),
-                              DataColumn(label: Text("Email")),
-                              DataColumn(label: Text("Role")),
-                              DataColumn(label: Text("Actions")),
-                            ], rows: [
-                              for (var user in _users)
-                                DataRow(cells: [
-                                  DataCell(Text(user["firstName"])),
-                                  DataCell(Text(user["lastName"])),
-                                  DataCell(Text(user["email"])),
-                                  DataCell(Text(user["role"])),
-                                  DataCell(
-                                    Row(
-                                      children: [
-                                        IconButton(
-                                          icon: const Icon(Icons.edit),
-                                          onPressed: () {},
-                                        ),
-                                        IconButton(
-                                          icon: const Icon(Icons.delete),
-                                          onPressed: () {},
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ]),
-                            ]),
+              Container(
+                margin: const EdgeInsets.all(8),
+                height: 50,
+                width: 300,
+                child: const Expanded(
+                  child: TextField(
+                    decoration: InputDecoration(
+                      hintText: "Search",
+                      prefixIcon: Icon(Icons.search),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          // users table
+          Expanded(
+            child: SingleChildScrollView(
+              child: DataTable(columns: const [
+                DataColumn(label: Text("First Name")),
+                DataColumn(label: Text("Last Name")),
+                DataColumn(label: Text("Email")),
+                DataColumn(label: Text("Role")),
+                DataColumn(label: Text("Actions")),
+              ], rows: [
+                for (var user in _users)
+                  DataRow(cells: [
+                    DataCell(Text(user["firstName"])),
+                    DataCell(Text(user["lastName"])),
+                    DataCell(Text(user["email"])),
+                    DataCell(Text(user["role"])),
+                    DataCell(
+                      Row(
+                        children: [
+                          IconButton(
+                            icon: const Icon(Icons.edit),
+                            onPressed: () {},
                           ),
-                        )
-                      ],
+                          IconButton(
+                            icon: const Icon(Icons.delete),
+                            onPressed: () {},
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                  // notifications
-                  Card(
-                    margin: const EdgeInsets.all(8),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Text("Notification settings"),
-                        SwitchListTile(
-                          value: false,
-                          onChanged: (val) {},
-                          title: const Text("Rent Payment"),
-                        ),
-                        SwitchListTile(
-                          value: false,
-                          onChanged: (val) {},
-                          title: const Text("Maintenance Requests"),
-                        ),
-                        SwitchListTile(
-                          value: false,
-                          onChanged: (val) {},
-                          title: const Text("System upgrade"),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
+                  ]),
+              ]),
             ),
-          ],
-        ),
+          )
+        ],
       ),
     );
   }
