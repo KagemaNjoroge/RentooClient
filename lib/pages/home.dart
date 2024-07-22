@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:rentoo_pms/pages/login.dart';
 
 import '../components/containers/communication.dart';
-import '../components/containers/company_home.dart';
 import '../components/containers/components.dart';
 import '../components/containers/dashboard.dart';
 import '../components/containers/houses_home.dart';
@@ -55,10 +54,6 @@ class _HomeState extends State<Home> {
       label: Text("Communication"),
     ),
     const NavigationRailDestination(
-      icon: Icon(Icons.business),
-      label: Text("Company"),
-    ),
-    const NavigationRailDestination(
       icon: Icon(Icons.settings),
       label: Text("Settings"),
     ),
@@ -78,7 +73,6 @@ class _HomeState extends State<Home> {
     const LeasesHome(),
     const PaymentsHome(),
     const Communication(),
-    const CompanyHome(),
     const SettingHome(),
     const Components()
   ];
