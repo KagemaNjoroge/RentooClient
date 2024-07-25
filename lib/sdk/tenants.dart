@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:file_selector/file_selector.dart';
 
 import '../models/tenant.dart';
 import 'base.dart';
@@ -135,5 +136,11 @@ class TenantsAPI implements BaseApi {
         "message": e.toString(),
       };
     }
+  }
+
+  @override
+  Future<Map<String, dynamic>> uploadFile(
+      String url, XFile file, String field) {
+    throw UnimplementedError();
   }
 }
