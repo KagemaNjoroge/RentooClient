@@ -73,8 +73,8 @@ class _CommunicationState extends State<Communication> {
                           : const Icon(Icons.done_all),
                       leading: const CircleAvatar(
                         radius: 30,
-                        backgroundImage: NetworkImage(
-                            "https://www.w3schools.com/w3images/avatar2.png"),
+                        backgroundImage:
+                            AssetImage("assets/images/user_avatar.png"),
                       ),
                       onTap: () {
                         showSnackBar(
@@ -105,8 +105,8 @@ class _CommunicationState extends State<Communication> {
                             children: [
                               CircleAvatar(
                                 radius: 30,
-                                backgroundImage: NetworkImage(
-                                    "https://www.w3schools.com/w3images/avatar2.png"),
+                                backgroundImage:
+                                    AssetImage("assets/images/user_avatar.png"),
                               ),
                               SizedBox(
                                 width: 5,
