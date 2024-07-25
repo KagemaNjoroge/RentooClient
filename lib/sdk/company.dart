@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:file_selector/file_selector.dart';
 
 import '../models/company.dart';
 import 'base.dart';
@@ -136,6 +137,33 @@ class CompanyAPI implements BaseApi {
         "status": "error",
         "message": e.toString(),
       };
+    }
+  }
+
+  @override
+  Future<Map<String, dynamic>> uploadFile(
+      String url, XFile file, String field) async {
+    // Create a FormData
+    FormData formData = FormData.fromMap({
+      "logo": await MultipartFile.fromFile(file.path),
+    });
+    // send patch request, assuming the company had been created
+    try {
+      var response = await _dio.patch(url, data: formData);
+      if (response.statusCode == 200) {
+        return {
+          "status": "success",
+          "company": Company.fromJson(response.data),
+        };
+      } else {
+        throw DioException(
+          requestOptions: response.requestOptions,
+          response: response,
+          error: "Failed to upload logo",
+        );
+      }
+    } catch (e) {
+      throw handleError(e);
     }
   }
 }
