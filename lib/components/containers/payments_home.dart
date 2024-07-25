@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../constants.dart';
 import '../../sdk/leases.dart';
-import '../common/tenant_selector.dart';
+
 
 class PaymentsHome extends StatefulWidget {
   const PaymentsHome({super.key});
@@ -174,9 +174,7 @@ class _PaymentsHomeState extends State<PaymentsHome> {
             ],
           ),
         ),
-        TenantSelector(
-          callback: () {},
-        )
+    
       ],
     );
   }
