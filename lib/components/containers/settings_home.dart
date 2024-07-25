@@ -1,7 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:rentoo_pms/sdk/user.dart';
 
+import '../../constants.dart';
+import '../../models/company.dart';
 import '../../providers/brightness.dart';
+import '../../sdk/company.dart';
+import '../../utils/snack.dart';
+import '../common/gap.dart';
 
 class SystemSettingsTab extends StatefulWidget {
   const SystemSettingsTab({super.key});
@@ -18,8 +24,11 @@ class _SystemSettingsTabState extends State<SystemSettingsTab> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _websiteController = TextEditingController();
   final TextEditingController _logoController = TextEditingController();
-  final List _supportedLanguages = ["English", "Swahili"];
+  final List _supportedLanguages = ["en", "sw"];
   final List _currencies = ["USD", "KES", "EUR", "GBP"];
+  String _currency = "KES";
+  String _language = "en";
+  int _companyId = 1;
   List<DropdownMenuItem> _getDropdownItems(List items) {
     List<DropdownMenuItem> dropdownItems = [];
     for (var item in items) {
@@ -31,6 +40,8 @@ class _SystemSettingsTabState extends State<SystemSettingsTab> {
     return dropdownItems;
   }
 
+  final CompanyAPI _companyAPI = CompanyAPI();
+
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -40,116 +51,195 @@ class _SystemSettingsTabState extends State<SystemSettingsTab> {
           // company name, phone, email, website, logo, currency symbol, language
           Container(
             margin: const EdgeInsets.all(8),
-            child: Form(
-              key: _formKey,
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Expanded(
-                    child: Column(
+            child: FutureBuilder(
+              future: _companyAPI.get(companyUrl),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.done &&
+                    snapshot.hasData) {
+                  if (snapshot.data!['companies'].isNotEmpty) {
+                    Company company = snapshot.data!['companies'].first;
+                    print(company.toJson());
+                    _companyNameController.text = company.name.toString();
+                    _websiteController.text = company.website.toString();
+                    _emailController.text = company.email.toString();
+                    _phoneController.text = company.phone.toString();
+                    _logoController.text = company.logo.toString();
+                    _currency = company.currency.toString();
+                    _language = company.language.toString();
+                    _companyId = int.tryParse(company.id.toString()) ?? 1;
+                  }
+
+                  return Form(
+                    key: _formKey,
+                    child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        TextFormField(
-                          controller: _companyNameController,
-                          decoration: const InputDecoration(
-                            icon: Icon(Icons.business),
-                            labelText: "Company Name",
+                        Expanded(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              TextFormField(
+                                controller: _companyNameController,
+                                decoration: const InputDecoration(
+                                  icon: Icon(Icons.business),
+                                  labelText: "Company Name",
+                                ),
+                              ),
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: TextFormField(
+                                      controller: _phoneController,
+                                      decoration: const InputDecoration(
+                                        icon: Icon(Icons.phone),
+                                        labelText: "Phone",
+                                      ),
+                                    ),
+                                  ),
+                                  Expanded(
+                                    child: TextFormField(
+                                      controller: _emailController,
+                                      decoration: const InputDecoration(
+                                        icon: Icon(Icons.email),
+                                        labelText: "Email",
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              TextFormField(
+                                controller: _websiteController,
+                                decoration: const InputDecoration(
+                                  icon: Icon(Icons.language),
+                                  labelText: "Website",
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: TextFormField(
-                                controller: _phoneController,
-                                decoration: const InputDecoration(
-                                  icon: Icon(Icons.phone),
-                                  labelText: "Phone",
+                        const Gap(),
+                        // logo, currency symbol, language
+                        Expanded(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              TextFormField(
+                                controller: _logoController,
+                                decoration: InputDecoration(
+                                  icon: const Icon(Icons.image),
+                                  labelText: "Logo",
+                                  suffix: IconButton(
+                                    onPressed: () {
+                                      showSnackBar(context, Colors.green,
+                                          "Select image from gallery", 300);
+                                    },
+                                    icon: const Icon(Icons.image_search),
+                                  ),
                                 ),
                               ),
-                            ),
-                            Expanded(
-                              child: TextFormField(
-                                controller: _emailController,
+                              DropdownButtonFormField(
+                                items: _getDropdownItems(_currencies),
+                                value: _currency,
+                                onChanged: (val) {
+                                  _currency = val;
+                                },
+                                validator: (value) {
+                                  if (value.toString().isEmpty) {
+                                    return "You have to select a currency";
+                                  }
+                                  return null;
+                                },
                                 decoration: const InputDecoration(
-                                  icon: Icon(Icons.email),
-                                  labelText: "Email",
+                                  icon: Icon(Icons.money),
+                                  labelText: "Currency Symbol",
                                 ),
                               ),
-                            ),
-                          ],
-                        ),
-                        TextFormField(
-                          controller: _websiteController,
-                          decoration: const InputDecoration(
-                            icon: Icon(Icons.language),
-                            labelText: "Website",
+                              DropdownButtonFormField(
+                                padding: EdgeInsets.zero,
+                                validator: (value) {
+                                  if (value.toString().isEmpty) {
+                                    return "You have to select a language";
+                                  }
+                                  return null;
+                                },
+                                items: _getDropdownItems(_supportedLanguages),
+                                value: _language,
+                                onChanged: (val) {
+                                  _language = val;
+                                },
+                                decoration: const InputDecoration(
+                                  icon: Icon(Icons.language),
+                                  labelText: "Language",
+                                ),
+                              ),
+                              const Gap(),
+                              ElevatedButton.icon(
+                                onPressed: () async {
+                                  if (_formKey.currentState!.validate()) {
+                                    // save settings
+                                    var url = "$companyUrl$_companyId/";
+
+                                    Company company = Company(
+                                      id: _companyId,
+                                      name: _companyNameController.text,
+                                      currency: _currency,
+                                      email: _emailController.text,
+                                      language: _language,
+                                      website: _websiteController.text,
+                                      phone: _phoneController.text,
+                                    );
+
+                                    try {
+                                      var response = await _companyAPI
+                                          .patch(url, body: company.toJson());
+                                      if (response['status'] == "success") {
+                                        showSnackBar(context, Colors.green,
+                                            "Company details updated", 300);
+                                        setState(() {});
+                                      } else {
+                                        showSnackBar(context, Colors.red,
+                                            "An error occurred", 300);
+                                      }
+                                    } catch (e) {
+                                      showSnackBar(context, Colors.red,
+                                          e.toString(), 600);
+                                    }
+                                  }
+                                },
+                                icon: const Icon(Icons.done),
+                                label: const Text("Save"),
+                              ),
+                            ],
                           ),
                         ),
                       ],
                     ),
-                  ),
-                  const SizedBox(
-                    width: 10,
-                  ),
-                  // logo, currency symbol, language
-                  Expanded(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        TextFormField(
-                          controller: _logoController,
-                          decoration: const InputDecoration(
-                            icon: Icon(Icons.image),
-                            labelText: "Logo",
-                          ),
-                        ),
-                        DropdownButtonFormField(
-                          items: _getDropdownItems(_currencies),
-                          onChanged: (val) {},
-                          decoration: const InputDecoration(
-                            icon: Icon(Icons.money),
-                            labelText: "Currency Symbol",
-                          ),
-                        ),
-                        DropdownButtonFormField(
-                          padding: EdgeInsets.zero,
-                          items: _getDropdownItems(_supportedLanguages),
-                          onChanged: (val) {},
-                          decoration: const InputDecoration(
-                            icon: Icon(Icons.language),
-                            labelText: "Language",
-                          ),
-                        ),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        ElevatedButton.icon(
-                          onPressed: () {
-                            if (_formKey.currentState!.validate()) {
-                              // save settings
-                            }
-                          },
-                          icon: const Icon(Icons.done),
-                          label: const Text("Save"),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
+                  );
+                }
+                return const Center(
+                    child: CircularProgressIndicator.adaptive());
+              },
             ),
           ),
 
-          SwitchListTile(
-            value: Provider.of<BrightnessProvider>(context).isDark,
-            onChanged: (val) {
-              Provider.of<BrightnessProvider>(context, listen: false)
-                  .swithTheme();
-            },
-            title: const Text("Switch theme"),
-          ),
+          const ThemeToggleSwitch()
         ],
       ),
+    );
+  }
+}
+
+class ThemeToggleSwitch extends StatelessWidget {
+  const ThemeToggleSwitch({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return SwitchListTile(
+      value: Provider.of<BrightnessProvider>(context).isDark,
+      onChanged: (val) {
+        Provider.of<BrightnessProvider>(context, listen: false).swithTheme();
+      },
+      title: const Text("Switch theme"),
     );
   }
 }
@@ -243,71 +333,61 @@ class _PaymentSettingsTabState extends State<PaymentSettingsTab> {
     {
       "type": "Mpesa",
       "description": "Mpesa payment method",
-      "logo":
-          "https://play-lh.googleusercontent.com/bRZF74-13jknePwUd1xam5ZCSdAJVuI_wqtkrisBgu7EEh1jobh2boZihlk-4ikY_S3V",
+      "logo": "assets/images/logo.png",
       "name": "Mpesa",
     },
     {
       "type": "Paypal",
       "description": "Paypal payment method",
-      "logo":
-          "https://play-lh.googleusercontent.com/bRZF74-13jknePwUd1xam5ZCSdAJVuI_wqtkrisBgu7EEh1jobh2boZihlk-4ikY_S3V",
+      "logo": "assets/images/logo.png",
       "name": "Paypal",
     },
     {
       "type": "Visa",
       "description": "Visa payment method",
-      "logo":
-          "https://play-lh.googleusercontent.com/bRZF74-13jknePwUd1xam5ZCSdAJVuI_wqtkrisBgu7EEh1jobh2boZihlk-4ikY_S3V",
+      "logo": "assets/images/logo.png",
       "name": "Visa",
     },
     {
       "type": "Mastercard",
       "description": "Mastercard payment method",
-      "logo":
-          "https://play-lh.googleusercontent.com/bRZF74-13jknePwUd1xam5ZCSdAJVuI_wqtkrisBgu7EEh1jobh2boZihlk-4ikY_S3V",
+      "logo": "assets/images/logo.png",
       "name": "Mastercard",
     },
     {
       "type": "American Express",
       "description": "American Express payment method",
-      "logo":
-          "https://play-lh.googleusercontent.com/bRZF74-13jknePwUd1xam5ZCSdAJVuI_wqtkrisBgu7EEh1jobh2boZihlk-4ikY_S3V",
+      "logo": "assets/images/logo.png",
       "name": "American Express",
     },
     {
       "type": "Discover",
       "description": "Discover payment method",
-      "logo":
-          "https://play-lh.googleusercontent.com/bRZF74-13jknePwUd1xam5ZCSdAJVuI_wqtkrisBgu7EEh1jobh2boZihlk-4ikY_S3V",
+      "logo": "assets/images/logo.png",
       "name": "Discover",
     },
     {
       "type": "Stripe",
       "description": "Stripe payment method",
-      "logo":
-          "https://play-lh.googleusercontent.com/bRZF74-13jknePwUd1xam5ZCSdAJVuI_wqtkrisBgu7EEh1jobh2boZihlk-4ikY_S3V",
+      "logo": "assets/images/logo.png",
       "name": "Stripe",
     },
     {
       "type": "Cash",
       "description": "Cash payment method",
-      "logo":
-          "https://play-lh.googleusercontent.com/bRZF74-13jknePwUd1xam5ZCSdAJVuI_wqtkrisBgu7EEh1jobh2boZihlk-4ikY_S3V",
+      "logo": "assets/images/logo.png",
       "name": "Cash",
     },
     {
       "type": "Bank Transfer",
       "description": "Bank Transfer payment method",
-      "logo":
-          "https://play-lh.googleusercontent.com/bRZF74-13jknePwUd1xam5ZCSdAJVuI_wqtkrisBgu7EEh1jobh2boZihlk-4ikY_S3V",
+      "logo": "assets/images/logo.png",
       "name": "Bank Transfer",
     },
     {
       "type": "Cheque",
       "description": "Cheque payment method",
-      "logo":
-          "https://play-lh.googleusercontent.com/bRZF74-13jknePwUd1xam5ZCSdAJVuI_wqtkrisBgu7EEh1jobh2boZihlk-4ikY_S3V",
+      "logo": "assets/images/logo.png",
       "name": "Cheque",
     }
   ];
@@ -348,9 +428,15 @@ class _PaymentSettingsTabState extends State<PaymentSettingsTab> {
               child: Expanded(
                 child: DataTable(
                   columns: const [
-                    DataColumn(label: Text("Name")),
-                    DataColumn(label: Text("Description")),
-                    DataColumn(label: Text("Actions")),
+                    DataColumn(
+                      label: Text("Name"),
+                    ),
+                    DataColumn(
+                      label: Text("Description"),
+                    ),
+                    DataColumn(
+                      label: Text("Actions"),
+                    ),
                   ],
                   rows: _paymentMethods
                       .map(
@@ -360,7 +446,7 @@ class _PaymentSettingsTabState extends State<PaymentSettingsTab> {
                               Row(
                                 children: [
                                   CircleAvatar(
-                                    backgroundImage: NetworkImage(e["logo"]),
+                                    backgroundImage: AssetImage(e['logo']),
                                   ),
                                   Padding(
                                     padding: const EdgeInsets.all(8.0),
@@ -452,6 +538,7 @@ class UserSettingsTab extends StatefulWidget {
 }
 
 class _UserSettingsTabState extends State<UserSettingsTab> {
+  final UserAPI _userAPI = UserAPI();
   // dummy users
   final List _users = [
     {
@@ -526,38 +613,75 @@ class _UserSettingsTabState extends State<UserSettingsTab> {
           ),
           // users table
           Expanded(
-            child: SingleChildScrollView(
-              child: DataTable(columns: const [
-                DataColumn(label: Text("First Name")),
-                DataColumn(label: Text("Last Name")),
-                DataColumn(label: Text("Email")),
-                DataColumn(label: Text("Role")),
-                DataColumn(label: Text("Actions")),
-              ], rows: [
-                for (var user in _users)
-                  DataRow(cells: [
-                    DataCell(Text(user["firstName"])),
-                    DataCell(Text(user["lastName"])),
-                    DataCell(Text(user["email"])),
-                    DataCell(Text(user["role"])),
-                    DataCell(
-                      Row(
-                        children: [
-                          IconButton(
-                            icon: const Icon(Icons.edit),
-                            onPressed: () {},
-                          ),
-                          IconButton(
-                            icon: const Icon(Icons.delete),
-                            onPressed: () {},
-                          ),
-                        ],
+              child: FutureBuilder(
+            builder: (context, snapshot) {
+              print(snapshot.data);
+              if (snapshot.hasError) {
+                return Text(snapshot.error.toString());
+              }
+              if (snapshot.hasData &&
+                  snapshot.connectionState == ConnectionState.done) {
+                return SingleChildScrollView(
+                  child: DataTable(
+                    columns: const [
+                      DataColumn(
+                        label: Text("First Name"),
                       ),
-                    ),
-                  ]),
-              ]),
-            ),
-          )
+                      DataColumn(
+                        label: Text("Last Name"),
+                      ),
+                      DataColumn(
+                        label: Text("Email"),
+                      ),
+                      DataColumn(
+                        label: Text("Role"),
+                      ),
+                      DataColumn(
+                        label: Text("Actions"),
+                      ),
+                    ],
+                    rows: [
+                      for (var user in _users)
+                        DataRow(
+                          cells: [
+                            DataCell(
+                              Text(user["firstName"]),
+                            ),
+                            DataCell(
+                              Text(user["lastName"]),
+                            ),
+                            DataCell(
+                              Text(user["email"]),
+                            ),
+                            DataCell(
+                              Text(user["role"]),
+                            ),
+                            DataCell(
+                              Row(
+                                children: [
+                                  IconButton(
+                                    icon: const Icon(Icons.edit),
+                                    onPressed: () {},
+                                  ),
+                                  IconButton(
+                                    icon: const Icon(Icons.delete),
+                                    onPressed: () {},
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                    ],
+                  ),
+                );
+              } else {
+                return const Center(
+                    child: CircularProgressIndicator.adaptive());
+              }
+            },
+            future: _userAPI.get(usersUrl),
+          ))
         ],
       ),
     );
