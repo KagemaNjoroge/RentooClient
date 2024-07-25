@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:file_selector/file_selector.dart';
 
 import '../models/lease.dart';
 import 'base.dart';
@@ -38,7 +39,6 @@ class LeasesAPI implements BaseApi {
       {Map<String, dynamic>? body}) async {
     try {
       final response = await _dio.post(url, data: body);
-      print(response.data);
       if (response.statusCode == 201) {
         return {
           "status": "success",
@@ -138,5 +138,11 @@ class LeasesAPI implements BaseApi {
         "message": e.toString(),
       };
     }
+  }
+
+  @override
+  Future<Map<String, dynamic>> uploadFile(
+      String url, XFile file, String field) {
+    throw UnimplementedError();
   }
 }
