@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:file_selector/file_selector.dart';
 
 import '../models/notification.dart';
 import 'base.dart';
@@ -137,5 +138,10 @@ class NotificationsAPI implements BaseApi {
         "message": e.toString(),
       };
     }
+  }
+    @override
+  Future<Map<String, dynamic>> uploadFile(
+      String url, XFile file, String field) {
+    throw UnimplementedError();
   }
 }
