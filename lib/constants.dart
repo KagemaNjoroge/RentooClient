@@ -48,7 +48,7 @@ const leasesUrl = "http://localhost:8000/leases/";
 const notificationsUrl = "http://localhost:8000/notifications/";
 const unitsUrl = 'http://localhost:8000/units/';
 const agentsUrl = "http://localhost:8000/agents/";
-
+const usersUrl = "http://localhost:8000/users/";
 // const companyUrl = "http://192.168.137.1:8000/company/";
 // const propertyUrl = "http://192.168.137.1:8000/properties/";
 // const housesUrl = "http://192.168.137.1:8000/houses/";
