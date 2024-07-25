@@ -1,13 +1,27 @@
+import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:rentoo_pms/models/user.dart';
 import 'package:rentoo_pms/sdk/user.dart';
 
 import '../../constants.dart';
 import '../../models/company.dart';
-import '../../providers/brightness.dart';
 import '../../sdk/company.dart';
 import '../../utils/snack.dart';
 import '../common/gap.dart';
+import '../common/theme_toggle_switch.dart';
+
+class CompanyLogo extends StatelessWidget {
+  String url;
+  CompanyLogo({super.key, required this.url});
+
+  @override
+  Widget build(BuildContext context) {
+    return CircleAvatar(
+      backgroundImage: NetworkImage(url),
+      radius: 50,
+    );
+  }
+}
 
 class SystemSettingsTab extends StatefulWidget {
   const SystemSettingsTab({super.key});
@@ -29,6 +43,9 @@ class _SystemSettingsTabState extends State<SystemSettingsTab> {
   String _currency = "KES";
   String _language = "en";
   int _companyId = 1;
+  String _logoUrl = "";
+  // selected image
+  XFile? _image;
   List<DropdownMenuItem> _getDropdownItems(List items) {
     List<DropdownMenuItem> dropdownItems = [];
     for (var item in items) {
@@ -41,6 +58,16 @@ class _SystemSettingsTabState extends State<SystemSettingsTab> {
   }
 
   final CompanyAPI _companyAPI = CompanyAPI();
+
+  Future<void> selectImage() async {
+    const XTypeGroup typeGroup =
+        XTypeGroup(label: 'images', extensions: ['jpg', 'png']);
+    final List<XFile> files = await openFiles(acceptedTypeGroups: [typeGroup]);
+    if (files.isNotEmpty) {
+      _logoController.text = files.first.path;
+      _image = files.first;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -58,7 +85,7 @@ class _SystemSettingsTabState extends State<SystemSettingsTab> {
                     snapshot.hasData) {
                   if (snapshot.data!['companies'].isNotEmpty) {
                     Company company = snapshot.data!['companies'].first;
-                    print(company.toJson());
+
                     _companyNameController.text = company.name.toString();
                     _websiteController.text = company.website.toString();
                     _emailController.text = company.email.toString();
@@ -67,6 +94,7 @@ class _SystemSettingsTabState extends State<SystemSettingsTab> {
                     _currency = company.currency.toString();
                     _language = company.language.toString();
                     _companyId = int.tryParse(company.id.toString()) ?? 1;
+                    _logoUrl = company.logo.toString();
                   }
 
                   return Form(
@@ -123,19 +151,23 @@ class _SystemSettingsTabState extends State<SystemSettingsTab> {
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              TextFormField(
-                                controller: _logoController,
-                                decoration: InputDecoration(
-                                  icon: const Icon(Icons.image),
-                                  labelText: "Logo",
-                                  suffix: IconButton(
-                                    onPressed: () {
-                                      showSnackBar(context, Colors.green,
-                                          "Select image from gallery", 300);
-                                    },
-                                    icon: const Icon(Icons.image_search),
+                              // Network image if company.logo is not null, else show placeholder, on image selection show selected image
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  CompanyLogo(
+                                    url: _logoUrl,
                                   ),
-                                ),
+                                  IconButton(
+                                    onPressed: () async {
+                                      await selectImage();
+                                      // upload temp image for preview&processing
+                                      saveSettings(context);
+                                    },
+                                    icon: const Icon(Icons.image),
+                                    tooltip: "Upload new logo",
+                                  ),
+                                ],
                               ),
                               DropdownButtonFormField(
                                 items: _getDropdownItems(_currencies),
@@ -176,34 +208,7 @@ class _SystemSettingsTabState extends State<SystemSettingsTab> {
                               ElevatedButton.icon(
                                 onPressed: () async {
                                   if (_formKey.currentState!.validate()) {
-                                    // save settings
-                                    var url = "$companyUrl$_companyId/";
-
-                                    Company company = Company(
-                                      id: _companyId,
-                                      name: _companyNameController.text,
-                                      currency: _currency,
-                                      email: _emailController.text,
-                                      language: _language,
-                                      website: _websiteController.text,
-                                      phone: _phoneController.text,
-                                    );
-
-                                    try {
-                                      var response = await _companyAPI
-                                          .patch(url, body: company.toJson());
-                                      if (response['status'] == "success") {
-                                        showSnackBar(context, Colors.green,
-                                            "Company details updated", 300);
-                                        setState(() {});
-                                      } else {
-                                        showSnackBar(context, Colors.red,
-                                            "An error occurred", 300);
-                                      }
-                                    } catch (e) {
-                                      showSnackBar(context, Colors.red,
-                                          e.toString(), 600);
-                                    }
+                                    await saveSettings(context);
                                   }
                                 },
                                 icon: const Icon(Icons.done),
@@ -227,20 +232,53 @@ class _SystemSettingsTabState extends State<SystemSettingsTab> {
       ),
     );
   }
-}
 
-class ThemeToggleSwitch extends StatelessWidget {
-  const ThemeToggleSwitch({super.key});
+  Future<void> saveSettings(BuildContext context) async {
+    // save settings
+    var url = "$companyUrl$_companyId/";
 
-  @override
-  Widget build(BuildContext context) {
-    return SwitchListTile(
-      value: Provider.of<BrightnessProvider>(context).isDark,
-      onChanged: (val) {
-        Provider.of<BrightnessProvider>(context, listen: false).swithTheme();
-      },
-      title: const Text("Switch theme"),
+    Company company = Company(
+      id: _companyId,
+      name: _companyNameController.text,
+      currency: _currency,
+      email: _emailController.text,
+      language: _language,
+      website: _websiteController.text,
+      phone: _phoneController.text,
     );
+
+    try {
+      var response = await _companyAPI.patch(url, body: company.toJson());
+      if (response['status'] == "success") {
+        if (mounted) {
+          showSnackBar(context, Colors.green, "Company details updated", 300);
+        }
+
+        // upload logo
+        if (_image != null) {
+          var uploadResponse =
+              await _companyAPI.uploadFile(url, _image!, "logo");
+          if (mounted) {
+            if (uploadResponse['status'] == "success") {
+              showSnackBar(context, Colors.green, "Logo uploaded", 300);
+            } else {
+              showSnackBar(context, Colors.red, "Failed to upload logo", 300);
+            }
+          }
+        }
+        if (mounted) {
+          setState(() {});
+        }
+      } else {
+        if (mounted) {
+          showSnackBar(context, Colors.red, "An error occurred", 300);
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        showSnackBar(context, Colors.red, e.toString(), 600);
+      }
+    }
   }
 }
 
@@ -402,10 +440,28 @@ class _PaymentSettingsTabState extends State<PaymentSettingsTab> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              ElevatedButton.icon(
-                onPressed: () {},
-                icon: const Icon(Icons.add),
-                label: const Text("Add Payment Method"),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  ElevatedButton.icon(
+                    onPressed: () {},
+                    icon: const Icon(Icons.add),
+                    label: const Text("Add Payment Method"),
+                  ),
+                  const HorizontalGap(),
+                  ElevatedButton.icon(
+                    onPressed: () {
+                      showModalBottomSheet(
+                        context: context,
+                        builder: (context) {
+                          return const MpesaPaymentsSettingsBottomSheet();
+                        },
+                      );
+                    },
+                    icon: const Icon(Icons.credit_card_rounded),
+                    label: const Text("MPESA Payments Settings"),
+                  ),
+                ],
               ),
               Container(
                 margin: const EdgeInsets.all(8),
@@ -425,58 +481,61 @@ class _PaymentSettingsTabState extends State<PaymentSettingsTab> {
           // table -> logo, name, description, actions
           Expanded(
             child: SingleChildScrollView(
-              child: Expanded(
-                child: DataTable(
-                  columns: const [
-                    DataColumn(
-                      label: Text("Name"),
-                    ),
-                    DataColumn(
-                      label: Text("Description"),
-                    ),
-                    DataColumn(
-                      label: Text("Actions"),
-                    ),
-                  ],
-                  rows: _paymentMethods
-                      .map(
-                        (e) => DataRow(
-                          cells: [
-                            DataCell(
-                              Row(
-                                children: [
-                                  CircleAvatar(
-                                    backgroundImage: AssetImage(e['logo']),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Text(e["name"]),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            DataCell(
-                              Text(e["description"]),
-                            ),
-                            DataCell(
-                              Row(
-                                children: [
-                                  IconButton(
-                                    icon: const Icon(Icons.edit),
-                                    onPressed: () {},
-                                  ),
-                                  IconButton(
-                                    icon: const Icon(Icons.delete),
-                                    onPressed: () {},
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
+              child: Row(
+                children: [
+                  Expanded(
+                    child: DataTable(
+                      columns: const [
+                        DataColumn(
+                          label: Text("Name"),
                         ),
-                      )
-                      .toList(),
-                ),
+                        DataColumn(
+                          label: Text("Description"),
+                        ),
+                        DataColumn(
+                          label: Text("Actions"),
+                        ),
+                      ],
+                      rows: _paymentMethods
+                          .map(
+                            (e) => DataRow(
+                              cells: [
+                                DataCell(
+                                  Row(
+                                    children: [
+                                      CircleAvatar(
+                                        backgroundImage: AssetImage(e['logo']),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Text(e["name"]),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                DataCell(
+                                  Text(e["description"]),
+                                ),
+                                DataCell(
+                                  Row(
+                                    children: [
+                                      IconButton(
+                                        icon: const Icon(Icons.remove_red_eye),
+                                        onPressed: () {
+                                          showSnackBar(context, Colors.green,
+                                              "Attach action here", 200);
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )
+                          .toList(),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
@@ -539,45 +598,7 @@ class UserSettingsTab extends StatefulWidget {
 
 class _UserSettingsTabState extends State<UserSettingsTab> {
   final UserAPI _userAPI = UserAPI();
-  // dummy users
-  final List _users = [
-    {
-      "firstName": "John",
-      "lastName": "Doe",
-      "email": "johndoe@example.com",
-      "role": "Admin",
-    },
-    {
-      "firstName": "Jane",
-      "lastName": "Doe",
-      "email": "janedoe@example.com",
-      "role": "User",
-    },
-    {
-      "firstName": "Alice",
-      "lastName": "Doe",
-      "email": "alicedoe@gmail.com",
-      "role": "User",
-    },
-    {
-      "firstName": "John",
-      "lastName": "Doe",
-      "email": "johndoe@example.com",
-      "role": "Admin",
-    },
-    {
-      "firstName": "Jane",
-      "lastName": "Doe",
-      "email": "janedoe@example.com",
-      "role": "User",
-    },
-    {
-      "firstName": "Alice",
-      "lastName": "Doe",
-      "email": "alicedoe@gmail.com",
-      "role": "User",
-    },
-  ];
+
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -615,63 +636,76 @@ class _UserSettingsTabState extends State<UserSettingsTab> {
           Expanded(
               child: FutureBuilder(
             builder: (context, snapshot) {
-              print(snapshot.data);
               if (snapshot.hasError) {
                 return Text(snapshot.error.toString());
               }
               if (snapshot.hasData &&
                   snapshot.connectionState == ConnectionState.done) {
+                List<User> users = snapshot.data!['users'];
                 return SingleChildScrollView(
-                  child: DataTable(
-                    columns: const [
-                      DataColumn(
-                        label: Text("First Name"),
-                      ),
-                      DataColumn(
-                        label: Text("Last Name"),
-                      ),
-                      DataColumn(
-                        label: Text("Email"),
-                      ),
-                      DataColumn(
-                        label: Text("Role"),
-                      ),
-                      DataColumn(
-                        label: Text("Actions"),
-                      ),
-                    ],
-                    rows: [
-                      for (var user in _users)
-                        DataRow(
-                          cells: [
-                            DataCell(
-                              Text(user["firstName"]),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: DataTable(
+                          columns: const [
+                            DataColumn(
+                              label: Text("First Name"),
                             ),
-                            DataCell(
-                              Text(user["lastName"]),
+                            DataColumn(
+                              label: Text("Last Name"),
                             ),
-                            DataCell(
-                              Text(user["email"]),
+                            DataColumn(
+                              label: Text("Email"),
                             ),
-                            DataCell(
-                              Text(user["role"]),
+                            DataColumn(
+                              label: Text("Role"),
                             ),
-                            DataCell(
-                              Row(
-                                children: [
-                                  IconButton(
-                                    icon: const Icon(Icons.edit),
-                                    onPressed: () {},
+                            DataColumn(label: Text("Active?")),
+                            DataColumn(
+                              label: Text("Actions"),
+                            ),
+                          ],
+                          rows: [
+                            for (var user in users)
+                              DataRow(
+                                cells: [
+                                  DataCell(
+                                    Text(user.firstName.toString()),
                                   ),
-                                  IconButton(
-                                    icon: const Icon(Icons.delete),
-                                    onPressed: () {},
+                                  DataCell(
+                                    Text(user.lastName.toString()),
+                                  ),
+                                  DataCell(
+                                    Text(user.email.toString()),
+                                  ),
+                                  DataCell(
+                                      Text(user.isStaff! ? "Admin" : "User")),
+                                  DataCell(
+                                    Radio(
+                                      value: user.isActive,
+                                      groupValue: user.isActive,
+                                      onChanged: (val) {},
+                                    ),
+                                  ),
+                                  DataCell(
+                                    Row(
+                                      children: [
+                                        IconButton(
+                                          icon: const Icon(Icons.edit),
+                                          onPressed: () {},
+                                        ),
+                                        IconButton(
+                                          icon: const Icon(Icons.delete),
+                                          onPressed: () {},
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ],
                               ),
-                            ),
                           ],
                         ),
+                      ),
                     ],
                   ),
                 );
@@ -683,6 +717,147 @@ class _UserSettingsTabState extends State<UserSettingsTab> {
             future: _userAPI.get(usersUrl),
           ))
         ],
+      ),
+    );
+  }
+}
+
+class MpesaPaymentsSettingsBottomSheet extends StatefulWidget {
+  const MpesaPaymentsSettingsBottomSheet({super.key});
+
+  @override
+  State<MpesaPaymentsSettingsBottomSheet> createState() =>
+      _MpesaPaymentsSettingsBottomSheetState();
+}
+
+class _MpesaPaymentsSettingsBottomSheetState
+    extends State<MpesaPaymentsSettingsBottomSheet> {
+  // controllers and keys
+  final GlobalKey<FormState> _formKey = GlobalKey();
+  final TextEditingController _consumerKeyController = TextEditingController();
+  final TextEditingController _consumerSecretController =
+      TextEditingController();
+  final TextEditingController _shortcodeController = TextEditingController();
+  final TextEditingController _passkeyController = TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: const BoxDecoration(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(20),
+          topRight: Radius.circular(20),
+        ),
+        border: Border(
+          top: BorderSide(
+            color: Colors.grey,
+            width: 1,
+          ),
+          left: BorderSide(
+            color: Colors.grey,
+            width: 1,
+          ),
+          right: BorderSide(
+            color: Colors.grey,
+            width: 1,
+          ),
+        ),
+      ),
+      child: Form(
+        key: _formKey,
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              const Text(
+                "MPESA Payments Settings",
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 20,
+                ),
+              ),
+              TextFormField(
+                controller: _consumerKeyController,
+                validator: (value) {
+                  if (value!.isEmpty) {
+                    return "Consumer key is required";
+                  }
+                  return null;
+                },
+                decoration: const InputDecoration(
+                  icon: Icon(Icons.vpn_key),
+                  labelText: "Consumer Key",
+                ),
+              ),
+              const Gap(),
+              TextFormField(
+                validator: (value) {
+                  if (value!.isEmpty) {
+                    return "Consumer key is required";
+                  }
+                  return null;
+                },
+                controller: _consumerSecretController,
+                decoration: const InputDecoration(
+                  icon: Icon(Icons.vpn_key),
+                  labelText: "Consumer Secret",
+                ),
+              ),
+              const Gap(),
+              TextFormField(
+                validator: (value) {
+                  if (value!.isEmpty) {
+                    return "Consumer key is required";
+                  }
+                  return null;
+                },
+                controller: _shortcodeController,
+                decoration: const InputDecoration(
+                  icon: Icon(Icons.phone),
+                  labelText: "Shortcode",
+                ),
+              ),
+              const Gap(),
+              TextFormField(
+                validator: (value) {
+                  if (value!.isEmpty) {
+                    return "Consumer key is required";
+                  }
+                  return null;
+                },
+                controller: _passkeyController,
+                decoration: const InputDecoration(
+                  icon: Icon(Icons.vpn_key),
+                  labelText: "Passkey",
+                ),
+              ),
+              const Gap(),
+              Row(
+                children: [
+                  ElevatedButton.icon(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    icon: const Icon(Icons.close),
+                    label: const Text("Cancel"),
+                  ),
+                  const HorizontalGap(),
+                  ElevatedButton.icon(
+                    onPressed: () {
+                      if (_formKey.currentState!.validate()) {
+                        // save settings
+                        Navigator.pop(context);
+                        showSnackBar(context, Colors.red, "To implement", 200);
+                      }
+                    },
+                    icon: const Icon(Icons.done),
+                    label: const Text("Save"),
+                  ),
+                ],
+              )
+            ],
+          ),
+        ),
       ),
     );
   }
