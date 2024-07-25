@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../common/property_selector.dart';
-
 class Components extends StatefulWidget {
   const Components({super.key});
 
@@ -25,7 +23,6 @@ class _ComponentsState extends State<Components> {
             ],
           ),
         ),
-        const PropertySelector()
       ],
     );
   }
