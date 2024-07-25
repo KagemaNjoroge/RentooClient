@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:file_selector/file_selector.dart';
 
 import '../models/house.dart';
 import '../models/property.dart';
@@ -137,6 +138,12 @@ class PropertyAPI implements BaseApi {
       };
     }
   }
+
+  @override
+  Future<Map<String, dynamic>> uploadFile(
+      String url, XFile file, String field) {
+    throw UnimplementedError();
+  }
 }
 
 class HousesAPI implements BaseApi {
@@ -273,5 +280,11 @@ class HousesAPI implements BaseApi {
         "message": e.toString(),
       };
     }
+  }
+
+  @override
+  Future<Map<String, dynamic>> uploadFile(
+      String url, XFile file, String field) {
+    throw UnimplementedError();
   }
 }
