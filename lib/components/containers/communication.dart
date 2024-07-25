@@ -51,12 +51,20 @@ class _CommunicationState extends State<Communication> {
       children: [
         Container(
           padding: const EdgeInsets.all(20),
-          child: const Row(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
+              const Text(
                 "Communication",
                 style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
-              )
+              ),
+              IconButton(
+                  onPressed: () {
+                    // show an action side menu
+                    showSnackBar(
+                        context, Colors.green, "More actions here", 200);
+                  },
+                  icon: const Icon(Icons.more_vert))
             ],
           ),
         ),
