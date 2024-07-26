@@ -13,7 +13,7 @@ class ThemeToggleSwitch extends StatelessWidget {
       onChanged: (val) {
         Provider.of<BrightnessProvider>(context, listen: false).swithTheme();
       },
-      title: const Text("Switch theme"),
+      title: const Text("Dark theme"),
     );
   }
 }
