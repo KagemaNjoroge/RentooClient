@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:rentoo_pms/constants.dart';
 
 class ImageSlider extends StatefulWidget {
   final List<String> imagePaths;
@@ -70,14 +71,14 @@ class _ImageSliderState extends State<ImageSlider> {
         Positioned(
           left: 10.0,
           child: IconButton(
-            icon: const Icon(Icons.arrow_back, color: Colors.white),
+            icon: const Icon(Icons.arrow_back, color: kPrimaryColor),
             onPressed: _previousImage,
           ),
         ),
         Positioned(
           right: 10.0,
           child: IconButton(
-            icon: const Icon(Icons.arrow_forward, color: Colors.white),
+            icon: const Icon(Icons.arrow_forward, color: kPrimaryColor),
             onPressed: _nextImage,
           ),
         ),
