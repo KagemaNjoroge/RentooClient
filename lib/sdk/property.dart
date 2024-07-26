@@ -144,6 +144,31 @@ class PropertyAPI implements BaseApi {
       String url, XFile file, String field) {
     throw UnimplementedError();
   }
+
+  @override
+  Future<Map<String, dynamic>> getItem(String url,
+      {Map<String, dynamic>? queryParameters}) async {
+    try {
+      final response = await _dio.get(url, queryParameters: queryParameters);
+      if (response.statusCode == 200) {
+        var property = Property.fromJson(response.data);
+        return {
+          "status": "success",
+          "property": property,
+        };
+      } else if (response.statusCode == 404) {
+        return {"status": "error", "detail": "Property not found"};
+      } else {
+        throw DioException(
+          requestOptions: response.requestOptions,
+          response: response,
+          error: "Failed to load property",
+        );
+      }
+    } catch (e) {
+      throw handleError(e);
+    }
+  }
 }
 
 class HousesAPI implements BaseApi {
@@ -212,7 +237,7 @@ class HousesAPI implements BaseApi {
         throw DioException(
           requestOptions: response.requestOptions,
           response: response,
-          error: "Failed to update property",
+          error: "Failed to update house",
         );
       }
     } catch (e) {
@@ -286,5 +311,30 @@ class HousesAPI implements BaseApi {
   Future<Map<String, dynamic>> uploadFile(
       String url, XFile file, String field) {
     throw UnimplementedError();
+  }
+
+  @override
+  Future<Map<String, dynamic>> getItem(String url,
+      {Map<String, dynamic>? queryParameters}) async {
+    try {
+      final response = await _dio.get(url, queryParameters: queryParameters);
+      if (response.statusCode == 200) {
+        var house = House.fromJson(response.data);
+        return {
+          "status": "success",
+          "house": house,
+        };
+      } else if (response.statusCode == 404) {
+        return {"status": "error", "detail": "House not found"};
+      } else {
+        throw DioException(
+          requestOptions: response.requestOptions,
+          response: response,
+          error: "Failed to load house",
+        );
+      }
+    } catch (e) {
+      throw handleError(e);
+    }
   }
 }
