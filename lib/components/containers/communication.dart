@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:rentoo_pms/components/common/gap.dart';
 
 import '../../constants.dart';
 import '../../utils/snack.dart';
@@ -141,6 +142,156 @@ class _CommunicationState extends State<Communication> {
                         ],
                       ),
                     ),
+                    // body
+                    Expanded(
+                      child: Container(
+                        padding: const EdgeInsets.all(8),
+                        child: SingleChildScrollView(
+                          child: Column(
+                            children: [
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.all(8),
+                                    height: 40,
+                                    decoration: const BoxDecoration(),
+                                    child: const Text("Hey James"),
+                                  ),
+                                  Column(
+                                    children: [
+                                      const Gap(),
+                                      const Gap(),
+                                      Container(
+                                        padding: const EdgeInsets.all(8),
+                                        height: 40,
+                                        child: const Text("Holla"),
+                                      ),
+                                    ],
+                                  )
+                                ],
+                              ),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.all(8),
+                                    height: 40,
+                                    decoration: const BoxDecoration(),
+                                    child: const Text("Hey James"),
+                                  ),
+                                  Column(
+                                    children: [
+                                      const Gap(),
+                                      const Gap(),
+                                      Container(
+                                        padding: const EdgeInsets.all(8),
+                                        height: 40,
+                                        child: const Text("Holla"),
+                                      ),
+                                    ],
+                                  )
+                                ],
+                              ),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.all(8),
+                                    height: 40,
+                                    decoration: const BoxDecoration(),
+                                    child: const Text("Hey James"),
+                                  ),
+                                  Column(
+                                    children: [
+                                      const Gap(),
+                                      const Gap(),
+                                      Container(
+                                        padding: const EdgeInsets.all(8),
+                                        height: 40,
+                                        child: const Text("Holla"),
+                                      ),
+                                    ],
+                                  )
+                                ],
+                              ),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.all(8),
+                                    height: 40,
+                                    decoration: const BoxDecoration(),
+                                    child: const Text("Hey James"),
+                                  ),
+                                  Column(
+                                    children: [
+                                      const Gap(),
+                                      const Gap(),
+                                      Container(
+                                        padding: const EdgeInsets.all(8),
+                                        height: 40,
+                                        child: const Text("Holla"),
+                                      ),
+                                    ],
+                                  )
+                                ],
+                              ),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.all(8),
+                                    height: 40,
+                                    decoration: const BoxDecoration(),
+                                    child: const Text("Hey James"),
+                                  ),
+                                  Column(
+                                    children: [
+                                      const Gap(),
+                                      const Gap(),
+                                      Container(
+                                        padding: const EdgeInsets.all(8),
+                                        height: 40,
+                                        child: const Text("Holla"),
+                                      ),
+                                    ],
+                                  )
+                                ],
+                              ),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.all(8),
+                                    height: 40,
+                                    decoration: const BoxDecoration(),
+                                    child: const Text("Hey James"),
+                                  ),
+                                  Column(
+                                    children: [
+                                      const Gap(),
+                                      const Gap(),
+                                      Container(
+                                        padding: const EdgeInsets.all(8),
+                                        height: 40,
+                                        child: const Text("Holla"),
+                                      ),
+                                    ],
+                                  )
+                                ],
+                              )
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
                     Container(
                       margin: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
@@ -171,7 +322,12 @@ class _CommunicationState extends State<Communication> {
                             ),
                           ),
                           IconButton(
-                            onPressed: _sendEnabled ? () {} : null,
+                            onPressed: _sendEnabled
+                                ? () {
+                                    showSnackBar(context, Colors.green,
+                                        "Sending...", 150);
+                                  }
+                                : null,
                             icon: const Icon(Icons.send),
                           )
                         ],
