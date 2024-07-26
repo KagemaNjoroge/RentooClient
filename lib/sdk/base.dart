@@ -11,4 +11,6 @@ abstract class BaseApi {
   dynamic handleError(dynamic e);
 
   Future<Map<String, dynamic>> uploadFile(String url, XFile file, String field);
+  Future<Map<String, dynamic>> getItem(String url,
+      {Map<String, dynamic>? queryParameters});
 }
