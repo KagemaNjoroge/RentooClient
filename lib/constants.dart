@@ -51,3 +51,6 @@ const agentsUrl = "http://localhost:8000/agents/";
 const usersUrl = "http://localhost:8000/users/";
 const tempUrl = "http://localhost:8000/temporary-files/";
 const propertyStatsUrl = "http://localhost:8000/stats/property-stats/";
+const mpesaPaymentSettingsUrl = "http://localhost:8000/mpesa-payment-settings/";
+const photosUrl = "http://localhost:8000/photos/";
+const houseStatsUrl = "http://localhost:8000/stats/property/";
