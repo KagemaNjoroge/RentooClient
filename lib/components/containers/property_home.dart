@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:rentoo_pms/components/containers/property_details.dart';
 
 import '../../constants.dart';
 import '../../models/property.dart';
@@ -136,7 +137,6 @@ class _AddPropertyBottomSheetState extends State<AddPropertyBottomSheet> {
                         address: _addressController.text,
                         description: _descriptionController.text,
                         purpose: _purposeController.text,
-                        photos: [],
                       );
                       try {
                         setState(() {
@@ -222,8 +222,7 @@ class _PropertyHomeState extends State<PropertyHome> {
                     label: const Text("Add Property"),
                     icon: const Icon(Icons.add),
                   ),
-                  // excel, pdf
-                  const SizedBox(width: 10),
+                  const HorizontalGap(),
                   _propertyExists
                       ? IconButton(
                           tooltip: "Download as Excel",
@@ -231,7 +230,7 @@ class _PropertyHomeState extends State<PropertyHome> {
                           icon: const Icon(Icons.download),
                         )
                       : const SizedBox(),
-                  const SizedBox(width: 10),
+                  const HorizontalGap(),
                   _propertyExists
                       ? IconButton(
                           tooltip: "Download as PDF",
@@ -283,20 +282,12 @@ class _PropertyHomeState extends State<PropertyHome> {
                                 TextButton(
                                   child: Text(property.name ?? ''),
                                   onPressed: () {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content:
-                                            const Text("Attach action here"),
-                                        behavior: SnackBarBehavior.floating,
-                                        backgroundColor: Colors.green,
-                                        width: 220,
-                                        action: SnackBarAction(
-                                          label: "Close",
-                                          onPressed: () =>
-                                              ScaffoldMessenger.of(context)
-                                                  .clearSnackBars(),
-                                        ),
-                                      ),
+                                    showBottomSheet(
+                                      context: context,
+                                      builder: (context) {
+                                        return PropertyDetailsBottomSheet(
+                                            propertyId: property.id);
+                                      },
                                     );
                                   },
                                 ),
