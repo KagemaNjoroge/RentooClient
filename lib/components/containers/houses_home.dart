@@ -255,15 +255,31 @@ class _HousesHomeState extends State<HousesHome> {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              ElevatedButton.icon(
-                onPressed: () {
-                  showBottomSheet(
-                    context: context,
-                    builder: (context) => const AddHouseBottomSheet(),
-                  );
-                },
-                icon: const Icon(Icons.add),
-                label: const Text("Add House"),
+              Row(
+                children: [
+                  ElevatedButton.icon(
+                    onPressed: () {
+                      showBottomSheet(
+                        context: context,
+                        builder: (context) => const AddHouseBottomSheet(),
+                      );
+                    },
+                    icon: const Icon(Icons.add),
+                    label: const Text("Add House"),
+                  ),
+                  const HorizontalGap(),
+                  IconButton(
+                    tooltip: "Download as Excel",
+                    onPressed: () {},
+                    icon: const Icon(Icons.download),
+                  ),
+                  const HorizontalGap(),
+                  IconButton(
+                    tooltip: "Download as PDF",
+                    onPressed: () {},
+                    icon: const Icon(Icons.picture_as_pdf),
+                  )
+                ],
               ),
             ],
           ),
