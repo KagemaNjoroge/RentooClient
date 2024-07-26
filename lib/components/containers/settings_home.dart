@@ -1,6 +1,8 @@
 import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
+import 'package:rentoo_pms/models/mpesa_payment_settings.dart';
 import 'package:rentoo_pms/models/user.dart';
+import 'package:rentoo_pms/sdk/settings/mpesa_payment_settings.dart';
 import 'package:rentoo_pms/sdk/user.dart';
 
 import '../../constants.dart';
@@ -162,7 +164,9 @@ class _SystemSettingsTabState extends State<SystemSettingsTab> {
                                     onPressed: () async {
                                       await selectImage();
                                       // upload temp image for preview&processing
-                                      saveSettings(context);
+                                      if (_image != null) {
+                                        saveSettings(context);
+                                      }
                                     },
                                     icon: const Icon(Icons.image),
                                     tooltip: "Upload new logo",
@@ -613,7 +617,15 @@ class _UserSettingsTabState extends State<UserSettingsTab> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               ElevatedButton.icon(
-                onPressed: () {},
+                onPressed: () {
+                  showBottomSheet(
+                    elevation: 3,
+                    context: context,
+                    builder: (context) {
+                      return const AddUserBottomSheet();
+                    },
+                  );
+                },
                 icon: const Icon(Icons.add),
                 label: const Text("Add User"),
               ),
@@ -634,88 +646,218 @@ class _UserSettingsTabState extends State<UserSettingsTab> {
           ),
           // users table
           Expanded(
-              child: FutureBuilder(
-            builder: (context, snapshot) {
-              if (snapshot.hasError) {
-                return Text(snapshot.error.toString());
-              }
-              if (snapshot.hasData &&
-                  snapshot.connectionState == ConnectionState.done) {
-                List<User> users = snapshot.data!['users'];
-                return SingleChildScrollView(
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: DataTable(
-                          columns: const [
-                            DataColumn(
-                              label: Text("First Name"),
-                            ),
-                            DataColumn(
-                              label: Text("Last Name"),
-                            ),
-                            DataColumn(
-                              label: Text("Email"),
-                            ),
-                            DataColumn(
-                              label: Text("Role"),
-                            ),
-                            DataColumn(label: Text("Active?")),
-                            DataColumn(
-                              label: Text("Actions"),
-                            ),
-                          ],
-                          rows: [
-                            for (var user in users)
-                              DataRow(
-                                cells: [
-                                  DataCell(
-                                    Text(user.firstName.toString()),
-                                  ),
-                                  DataCell(
-                                    Text(user.lastName.toString()),
-                                  ),
-                                  DataCell(
-                                    Text(user.email.toString()),
-                                  ),
-                                  DataCell(
-                                      Text(user.isStaff! ? "Admin" : "User")),
-                                  DataCell(
-                                    Radio(
-                                      value: user.isActive,
-                                      groupValue: user.isActive,
-                                      onChanged: (val) {},
-                                    ),
-                                  ),
-                                  DataCell(
-                                    Row(
-                                      children: [
-                                        IconButton(
-                                          icon: const Icon(Icons.edit),
-                                          onPressed: () {},
-                                        ),
-                                        IconButton(
-                                          icon: const Icon(Icons.delete),
-                                          onPressed: () {},
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
+            child: FutureBuilder(
+              builder: (context, snapshot) {
+                if (snapshot.hasError) {
+                  return Text(snapshot.error.toString());
+                }
+                if (snapshot.hasData &&
+                    snapshot.connectionState == ConnectionState.done) {
+                  List<User> users = snapshot.data!['users'];
+                  return SingleChildScrollView(
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: DataTable(
+                            columns: const [
+                              DataColumn(
+                                label: Text("First Name"),
                               ),
+                              DataColumn(
+                                label: Text("Last Name"),
+                              ),
+                              DataColumn(
+                                label: Text("Email"),
+                              ),
+                              DataColumn(
+                                label: Text("Role"),
+                              ),
+                              DataColumn(label: Text("Active?")),
+                              DataColumn(
+                                label: Text("Actions"),
+                              ),
+                            ],
+                            rows: [
+                              for (var user in users)
+                                DataRow(
+                                  cells: [
+                                    DataCell(
+                                      Text(user.firstName.toString()),
+                                    ),
+                                    DataCell(
+                                      Text(user.lastName.toString()),
+                                    ),
+                                    DataCell(
+                                      Text(user.email.toString()),
+                                    ),
+                                    DataCell(
+                                        Text(user.isStaff! ? "Admin" : "User")),
+                                    DataCell(
+                                      Radio(
+                                        value: user.isActive,
+                                        groupValue: user.isActive,
+                                        onChanged: (val) {},
+                                      ),
+                                    ),
+                                    DataCell(
+                                      Row(
+                                        children: [
+                                          IconButton(
+                                            icon: const Icon(Icons.edit),
+                                            onPressed: () {},
+                                          ),
+                                          IconButton(
+                                            icon: const Icon(Icons.delete),
+                                            onPressed: () {},
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                } else {
+                  return const Center(
+                      child: CircularProgressIndicator.adaptive());
+                }
+              },
+              future: _userAPI.get(usersUrl),
+            ),
+          )
+        ],
+      ),
+    );
+  }
+}
+
+class AddUserBottomSheet extends StatefulWidget {
+  const AddUserBottomSheet({super.key});
+
+  @override
+  State<AddUserBottomSheet> createState() => _AddUserBottomSheetState();
+}
+
+class _AddUserBottomSheetState extends State<AddUserBottomSheet> {
+  final bool _isLoading = false;
+  // controllers and form keys
+  final GlobalKey<FormState> _formKey = GlobalKey();
+  final TextEditingController _firstNameController = TextEditingController();
+  final TextEditingController _lastNameController = TextEditingController();
+  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: const BoxDecoration(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(20),
+          topRight: Radius.circular(20),
+        ),
+        border: Border(
+          top: BorderSide(
+            color: Colors.grey,
+            width: 1,
+          ),
+          left: BorderSide(
+            color: Colors.grey,
+            width: 1,
+          ),
+          right: BorderSide(
+            color: Colors.grey,
+            width: 1,
+          ),
+        ),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Text(
+            "Add user",
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 20,
+            ),
+          ),
+          const Gap(),
+          SingleChildScrollView(
+            child: Expanded(
+              child: Column(
+                children: [
+                  Form(
+                    key: _formKey,
+                    child: Column(
+                      children: [
+                        Row(
+                          children: [
+                            Expanded(
+                              child: TextFormField(
+                                controller: _firstNameController,
+                                decoration: const InputDecoration(
+                                    hintText: "First Name"),
+                              ),
+                            ),
+                            const HorizontalGap(),
+                            Expanded(
+                              child: TextFormField(
+                                controller: _lastNameController,
+                                decoration: const InputDecoration(
+                                    hintText: "Last Name"),
+                              ),
+                            ),
                           ],
                         ),
+                        TextFormField(
+                          controller: _usernameController,
+                          decoration:
+                              const InputDecoration(hintText: "Username"),
+                        ),
+                        const Gap(),
+                        TextFormField(
+                          controller: _passwordController,
+                          decoration:
+                              const InputDecoration(hintText: "Password"),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const Gap(),
+                  Row(
+                    children: [
+                      ElevatedButton.icon(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        icon: const Icon(Icons.close),
+                        label: const Text("Cancel"),
+                      ),
+                      const HorizontalGap(),
+                      ElevatedButton.icon(
+                        onPressed: () async {
+                          if (_formKey.currentState!.validate()) {
+                            // save settings
+                          }
+                        },
+                        icon: const Icon(Icons.done),
+                        label: _isLoading
+                            ? const Center(
+                                child: CircularProgressIndicator.adaptive(
+                                  strokeWidth: 2,
+                                ),
+                              )
+                            : const Text("Save"),
                       ),
                     ],
                   ),
-                );
-              } else {
-                return const Center(
-                    child: CircularProgressIndicator.adaptive());
-              }
-            },
-            future: _userAPI.get(usersUrl),
-          ))
+                ],
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -739,6 +881,159 @@ class _MpesaPaymentsSettingsBottomSheetState
       TextEditingController();
   final TextEditingController _shortcodeController = TextEditingController();
   final TextEditingController _passkeyController = TextEditingController();
+  // state
+  bool _consumerKeyIsVisible = true;
+  bool _consumerSecretIsVisible = true;
+  bool _passKeyIsVisible = true;
+  bool _isLoading = false;
+
+  final MpesaPaymentSettingsAPI _mpesaPaymentSettingsAPI =
+      MpesaPaymentSettingsAPI();
+
+  Widget _mpesaSettingsForm(String url, Function submitData) {
+    return Column(
+      children: [
+        const Text(
+          "MPESA Payments Settings",
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 20,
+          ),
+        ),
+        Expanded(
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                TextFormField(
+                  validator: (value) {
+                    if (value!.isEmpty) {
+                      return "Short code is required";
+                    }
+                    return null;
+                  },
+                  controller: _shortcodeController,
+                  decoration: const InputDecoration(
+                    icon: Icon(Icons.phone),
+                    labelText: "Shortcode",
+                  ),
+                ),
+                const Gap(),
+                TextFormField(
+                  obscureText: _consumerKeyIsVisible,
+                  controller: _consumerKeyController,
+                  validator: (value) {
+                    if (value!.isEmpty) {
+                      return "Consumer key is required";
+                    }
+                    return null;
+                  },
+                  decoration: InputDecoration(
+                    suffix: IconButton(
+                      onPressed: () {
+                        setState(() {
+                          _consumerKeyIsVisible = !_consumerKeyIsVisible;
+                        });
+                      },
+                      icon: _consumerKeyIsVisible
+                          ? const Icon(Icons.remove_red_eye)
+                          : const Icon(Icons.visibility_off),
+                    ),
+                    icon: const Icon(Icons.vpn_key),
+                    labelText: "Consumer Key",
+                  ),
+                ),
+                const Gap(),
+                TextFormField(
+                  obscureText: _consumerSecretIsVisible,
+                  validator: (value) {
+                    if (value!.isEmpty) {
+                      return "Consumer secret is required";
+                    }
+                    return null;
+                  },
+                  controller: _consumerSecretController,
+                  decoration: InputDecoration(
+                    suffix: IconButton(
+                      onPressed: () {
+                        setState(() {
+                          _consumerSecretIsVisible = !_consumerSecretIsVisible;
+                        });
+                      },
+                      icon: _consumerSecretIsVisible
+                          ? const Icon(Icons.remove_red_eye)
+                          : const Icon(Icons.visibility_off),
+                    ),
+                    icon: const Icon(Icons.vpn_key),
+                    labelText: "Consumer Secret",
+                  ),
+                ),
+                const Gap(),
+                TextFormField(
+                  obscureText: _passKeyIsVisible,
+                  validator: (value) {
+                    if (value!.isEmpty) {
+                      return "Pass key is required";
+                    }
+                    return null;
+                  },
+                  controller: _passkeyController,
+                  decoration: InputDecoration(
+                    suffix: IconButton(
+                      onPressed: () {
+                        setState(() {
+                          _passKeyIsVisible = !_passKeyIsVisible;
+                        });
+                      },
+                      icon: _passKeyIsVisible
+                          ? const Icon(Icons.remove_red_eye)
+                          : const Icon(Icons.visibility_off),
+                    ),
+                    icon: const Icon(Icons.vpn_key),
+                    labelText: "Passkey",
+                  ),
+                ),
+                const Gap(),
+                Row(
+                  children: [
+                    ElevatedButton.icon(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      icon: const Icon(Icons.close),
+                      label: const Text("Cancel"),
+                    ),
+                    const HorizontalGap(),
+                    ElevatedButton.icon(
+                      onPressed: () async {
+                        if (_formKey.currentState!.validate()) {
+                          // save settings
+                          setState(() {
+                            _isLoading = true;
+                          });
+                          await submitData();
+                          setState(() {
+                            _isLoading = false;
+                          });
+                        }
+                      },
+                      icon: const Icon(Icons.done),
+                      label: _isLoading
+                          ? const Center(
+                              child: CircularProgressIndicator.adaptive(
+                                strokeWidth: 2,
+                              ),
+                            )
+                          : const Text("Save"),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        )
+      ],
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -766,97 +1061,62 @@ class _MpesaPaymentsSettingsBottomSheetState
       ),
       child: Form(
         key: _formKey,
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              const Text(
-                "MPESA Payments Settings",
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 20,
-                ),
-              ),
-              TextFormField(
-                controller: _consumerKeyController,
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return "Consumer key is required";
-                  }
-                  return null;
-                },
-                decoration: const InputDecoration(
-                  icon: Icon(Icons.vpn_key),
-                  labelText: "Consumer Key",
-                ),
-              ),
-              const Gap(),
-              TextFormField(
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return "Consumer key is required";
-                  }
-                  return null;
-                },
-                controller: _consumerSecretController,
-                decoration: const InputDecoration(
-                  icon: Icon(Icons.vpn_key),
-                  labelText: "Consumer Secret",
-                ),
-              ),
-              const Gap(),
-              TextFormField(
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return "Consumer key is required";
-                  }
-                  return null;
-                },
-                controller: _shortcodeController,
-                decoration: const InputDecoration(
-                  icon: Icon(Icons.phone),
-                  labelText: "Shortcode",
-                ),
-              ),
-              const Gap(),
-              TextFormField(
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return "Consumer key is required";
-                  }
-                  return null;
-                },
-                controller: _passkeyController,
-                decoration: const InputDecoration(
-                  icon: Icon(Icons.vpn_key),
-                  labelText: "Passkey",
-                ),
-              ),
-              const Gap(),
-              Row(
-                children: [
-                  ElevatedButton.icon(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    icon: const Icon(Icons.close),
-                    label: const Text("Cancel"),
-                  ),
-                  const HorizontalGap(),
-                  ElevatedButton.icon(
-                    onPressed: () {
-                      if (_formKey.currentState!.validate()) {
-                        // save settings
-                        Navigator.pop(context);
-                        showSnackBar(context, Colors.red, "To implement", 200);
-                      }
-                    },
-                    icon: const Icon(Icons.done),
-                    label: const Text("Save"),
-                  ),
-                ],
-              )
-            ],
-          ),
+        child: FutureBuilder(
+          future: _mpesaPaymentSettingsAPI.get(mpesaPaymentSettingsUrl),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.done &&
+                snapshot.hasData) {
+              if (snapshot.data!['status'] == "success") {
+                if (snapshot.data!['settings'].isEmpty) {
+                  return _mpesaSettingsForm(mpesaPaymentSettingsUrl, () async {
+                    MpesaPaymentSettings newSettings = MpesaPaymentSettings(
+                      consumerKey: _consumerKeyController.text,
+                      consumerSecret: _consumerSecretController.text,
+                      shortCode: _shortcodeController.text,
+                      passKey: _passkeyController.text,
+                      testMode: false,
+                    );
+                    await _mpesaPaymentSettingsAPI.post(mpesaPaymentSettingsUrl,
+                        body: newSettings.toJson());
+                  });
+                } else {
+                  MpesaPaymentSettings settings =
+                      snapshot.data!['settings'].first;
+                  var url = "$mpesaPaymentSettingsUrl${settings.id}/";
+
+                  _shortcodeController.text = settings.shortCode.toString();
+                  _consumerKeyController.text = settings.consumerKey.toString();
+                  _passkeyController.text = settings.passKey.toString();
+                  _consumerSecretController.text =
+                      settings.consumerSecret.toString();
+                  return _mpesaSettingsForm(url, () async {
+                    MpesaPaymentSettings newSettings = MpesaPaymentSettings(
+                      consumerKey: _consumerKeyController.text,
+                      consumerSecret: _consumerSecretController.text,
+                      shortCode: _shortcodeController.text,
+                      passKey: _passkeyController.text,
+                      testMode: false,
+                    );
+
+                    await _mpesaPaymentSettingsAPI.patch(url,
+                        body: newSettings.toJson());
+                    setState(() {
+                      _isLoading = false;
+                    });
+                    showSnackBar(
+                        context, Colors.red, "Uploaded successfully", 200);
+                  });
+                }
+              } else {
+                return const Center(
+                  child: CircularProgressIndicator.adaptive(),
+                );
+              }
+            }
+            return const Center(
+              child: CircularProgressIndicator.adaptive(),
+            );
+          },
         ),
       ),
     );
