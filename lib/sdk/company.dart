@@ -166,4 +166,10 @@ class CompanyAPI implements BaseApi {
       throw handleError(e);
     }
   }
+  
+  @override
+  Future<Map<String, dynamic>> getItem(String url, {Map<String, dynamic>? queryParameters}) {
+    // TODO: implement getItem
+    throw UnimplementedError();
+  }
 }
