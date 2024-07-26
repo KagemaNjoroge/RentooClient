@@ -145,4 +145,10 @@ class UnitsAPI implements BaseApi {
       String url, XFile file, String field) {
     throw UnimplementedError();
   }
+  
+  @override
+  Future<Map<String, dynamic>> getItem(String url, {Map<String, dynamic>? queryParameters}) {
+    // TODO: implement getItem
+    throw UnimplementedError();
+  }
 }
