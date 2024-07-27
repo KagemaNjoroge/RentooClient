@@ -1,13 +1,15 @@
 import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
-import 'package:rentoo_pms/models/mpesa_payment_settings.dart';
-import 'package:rentoo_pms/models/user.dart';
-import 'package:rentoo_pms/sdk/settings/mpesa_payment_settings.dart';
-import 'package:rentoo_pms/sdk/user.dart';
 
 import '../../constants.dart';
 import '../../models/company.dart';
+import '../../models/mpesa_payment_settings.dart';
+import '../../models/payment_method.dart';
+import '../../models/user.dart';
 import '../../sdk/company.dart';
+import '../../sdk/payment_method.dart';
+import '../../sdk/settings/mpesa_payment_settings.dart';
+import '../../sdk/user.dart';
 import '../../utils/snack.dart';
 import '../common/gap.dart';
 import '../common/theme_toggle_switch.dart';
@@ -61,6 +63,134 @@ class _SystemSettingsTabState extends State<SystemSettingsTab> {
 
   final CompanyAPI _companyAPI = CompanyAPI();
 
+  Widget _companyDetailsForm(bool isSaving) {
+    return Form(
+      key: _formKey,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Expanded(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextFormField(
+                  controller: _companyNameController,
+                  decoration: const InputDecoration(
+                    icon: Icon(Icons.business),
+                    labelText: "Company Name",
+                  ),
+                ),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextFormField(
+                        controller: _phoneController,
+                        decoration: const InputDecoration(
+                          icon: Icon(Icons.phone),
+                          labelText: "Phone",
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: TextFormField(
+                        controller: _emailController,
+                        decoration: const InputDecoration(
+                          icon: Icon(Icons.email),
+                          labelText: "Email",
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                TextFormField(
+                  controller: _websiteController,
+                  decoration: const InputDecoration(
+                    icon: Icon(Icons.language),
+                    labelText: "Website",
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const Gap(),
+          // logo, currency symbol, language
+          Expanded(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Network image if company.logo is not null, else show placeholder, on image selection show selected image
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    CompanyLogo(
+                      url: _logoUrl,
+                    ),
+                    IconButton(
+                      onPressed: () async {
+                        await selectImage();
+                      },
+                      icon: const Icon(Icons.image),
+                      tooltip: "Upload new logo",
+                    ),
+                  ],
+                ),
+                DropdownButtonFormField(
+                  items: _getDropdownItems(_currencies),
+                  value: _currency,
+                  onChanged: (val) {
+                    _currency = val;
+                  },
+                  validator: (value) {
+                    if (value.toString().isEmpty) {
+                      return "You have to select a currency";
+                    }
+                    return null;
+                  },
+                  decoration: const InputDecoration(
+                    icon: Icon(Icons.money),
+                    labelText: "Currency Symbol",
+                  ),
+                ),
+                DropdownButtonFormField(
+                  padding: EdgeInsets.zero,
+                  validator: (value) {
+                    if (value.toString().isEmpty) {
+                      return "You have to select a language";
+                    }
+                    return null;
+                  },
+                  items: _getDropdownItems(_supportedLanguages),
+                  value: _language,
+                  onChanged: (val) {
+                    _language = val;
+                  },
+                  decoration: const InputDecoration(
+                    icon: Icon(Icons.language),
+                    labelText: "Language",
+                  ),
+                ),
+                const Gap(),
+                ElevatedButton.icon(
+                  onPressed: () async {
+                    if (_formKey.currentState!.validate()) {
+                      if (!isSaving) {
+                        await saveSettings();
+                      } else if (isSaving) {
+                        await createSettings();
+                      }
+                    }
+                  },
+                  icon: const Icon(Icons.done),
+                  label: const Text("Save"),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Future<void> selectImage() async {
     const XTypeGroup typeGroup =
         XTypeGroup(label: 'images', extensions: ['jpg', 'png']);
@@ -97,133 +227,10 @@ class _SystemSettingsTabState extends State<SystemSettingsTab> {
                     _language = company.language.toString();
                     _companyId = int.tryParse(company.id.toString()) ?? 1;
                     _logoUrl = company.logo.toString();
+                    return _companyDetailsForm(false);
+                  } else {
+                    return _companyDetailsForm(true);
                   }
-
-                  return Form(
-                    key: _formKey,
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Expanded(
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              TextFormField(
-                                controller: _companyNameController,
-                                decoration: const InputDecoration(
-                                  icon: Icon(Icons.business),
-                                  labelText: "Company Name",
-                                ),
-                              ),
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: TextFormField(
-                                      controller: _phoneController,
-                                      decoration: const InputDecoration(
-                                        icon: Icon(Icons.phone),
-                                        labelText: "Phone",
-                                      ),
-                                    ),
-                                  ),
-                                  Expanded(
-                                    child: TextFormField(
-                                      controller: _emailController,
-                                      decoration: const InputDecoration(
-                                        icon: Icon(Icons.email),
-                                        labelText: "Email",
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              TextFormField(
-                                controller: _websiteController,
-                                decoration: const InputDecoration(
-                                  icon: Icon(Icons.language),
-                                  labelText: "Website",
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const Gap(),
-                        // logo, currency symbol, language
-                        Expanded(
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              // Network image if company.logo is not null, else show placeholder, on image selection show selected image
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  CompanyLogo(
-                                    url: _logoUrl,
-                                  ),
-                                  IconButton(
-                                    onPressed: () async {
-                                      await selectImage();
-                                      // upload temp image for preview&processing
-                                      if (_image != null) {
-                                        saveSettings(context);
-                                      }
-                                    },
-                                    icon: const Icon(Icons.image),
-                                    tooltip: "Upload new logo",
-                                  ),
-                                ],
-                              ),
-                              DropdownButtonFormField(
-                                items: _getDropdownItems(_currencies),
-                                value: _currency,
-                                onChanged: (val) {
-                                  _currency = val;
-                                },
-                                validator: (value) {
-                                  if (value.toString().isEmpty) {
-                                    return "You have to select a currency";
-                                  }
-                                  return null;
-                                },
-                                decoration: const InputDecoration(
-                                  icon: Icon(Icons.money),
-                                  labelText: "Currency Symbol",
-                                ),
-                              ),
-                              DropdownButtonFormField(
-                                padding: EdgeInsets.zero,
-                                validator: (value) {
-                                  if (value.toString().isEmpty) {
-                                    return "You have to select a language";
-                                  }
-                                  return null;
-                                },
-                                items: _getDropdownItems(_supportedLanguages),
-                                value: _language,
-                                onChanged: (val) {
-                                  _language = val;
-                                },
-                                decoration: const InputDecoration(
-                                  icon: Icon(Icons.language),
-                                  labelText: "Language",
-                                ),
-                              ),
-                              const Gap(),
-                              ElevatedButton.icon(
-                                onPressed: () async {
-                                  if (_formKey.currentState!.validate()) {
-                                    await saveSettings(context);
-                                  }
-                                },
-                                icon: const Icon(Icons.done),
-                                label: const Text("Save"),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
                 }
                 return const Center(
                     child: CircularProgressIndicator.adaptive());
@@ -237,7 +244,39 @@ class _SystemSettingsTabState extends State<SystemSettingsTab> {
     );
   }
 
-  Future<void> saveSettings(BuildContext context) async {
+  Future<void> createSettings() async {
+    Company company = Company(
+      id: _companyId,
+      name: _companyNameController.text,
+      currency: _currency,
+      email: _emailController.text,
+      language: _language,
+      website: _websiteController.text,
+      phone: _phoneController.text,
+    );
+    try {
+      var response = await _companyAPI.post(companyUrl, body: company.toJson());
+      if (response['status'] == "success") {
+        if (mounted) {
+          showSnackBar(context, Colors.green, "Created successfully.", 300);
+        }
+
+        if (mounted) {
+          setState(() {});
+        }
+      } else {
+        if (mounted) {
+          showSnackBar(context, Colors.red, "An error occurred", 300);
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        showSnackBar(context, Colors.red, e.toString(), 600);
+      }
+    }
+  }
+
+  Future<void> saveSettings() async {
     // save settings
     var url = "$companyUrl$_companyId/";
 
@@ -370,69 +409,8 @@ class PaymentSettingsTab extends StatefulWidget {
 }
 
 class _PaymentSettingsTabState extends State<PaymentSettingsTab> {
-  // dummy payment methods
-  final List _paymentMethods = [
-    {
-      "type": "Mpesa",
-      "description": "Mpesa payment method",
-      "logo": "assets/images/logo.png",
-      "name": "Mpesa",
-    },
-    {
-      "type": "Paypal",
-      "description": "Paypal payment method",
-      "logo": "assets/images/logo.png",
-      "name": "Paypal",
-    },
-    {
-      "type": "Visa",
-      "description": "Visa payment method",
-      "logo": "assets/images/logo.png",
-      "name": "Visa",
-    },
-    {
-      "type": "Mastercard",
-      "description": "Mastercard payment method",
-      "logo": "assets/images/logo.png",
-      "name": "Mastercard",
-    },
-    {
-      "type": "American Express",
-      "description": "American Express payment method",
-      "logo": "assets/images/logo.png",
-      "name": "American Express",
-    },
-    {
-      "type": "Discover",
-      "description": "Discover payment method",
-      "logo": "assets/images/logo.png",
-      "name": "Discover",
-    },
-    {
-      "type": "Stripe",
-      "description": "Stripe payment method",
-      "logo": "assets/images/logo.png",
-      "name": "Stripe",
-    },
-    {
-      "type": "Cash",
-      "description": "Cash payment method",
-      "logo": "assets/images/logo.png",
-      "name": "Cash",
-    },
-    {
-      "type": "Bank Transfer",
-      "description": "Bank Transfer payment method",
-      "logo": "assets/images/logo.png",
-      "name": "Bank Transfer",
-    },
-    {
-      "type": "Cheque",
-      "description": "Cheque payment method",
-      "logo": "assets/images/logo.png",
-      "name": "Cheque",
-    }
-  ];
+  final PaymentMethodMethodAPI _paymentMethodMethodAPI =
+      PaymentMethodMethodAPI();
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -448,13 +426,19 @@ class _PaymentSettingsTabState extends State<PaymentSettingsTab> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   ElevatedButton.icon(
-                    onPressed: () {},
+                    onPressed: () {
+                      showBottomSheet(
+                          context: context,
+                          builder: (_) {
+                            return const AddPaymentMethodBottomSheet();
+                          });
+                    },
                     icon: const Icon(Icons.add),
                     label: const Text("Add Payment Method"),
                   ),
                   const HorizontalGap(),
                   ElevatedButton.icon(
-                    onPressed: () {
+                    onPressed: () async {
                       showModalBottomSheet(
                         context: context,
                         builder: (context) {
@@ -482,67 +466,87 @@ class _PaymentSettingsTabState extends State<PaymentSettingsTab> {
               ),
             ],
           ),
-          // table -> logo, name, description, actions
-          Expanded(
-            child: SingleChildScrollView(
-              child: Row(
-                children: [
-                  Expanded(
-                    child: DataTable(
-                      columns: const [
-                        DataColumn(
-                          label: Text("Name"),
-                        ),
-                        DataColumn(
-                          label: Text("Description"),
-                        ),
-                        DataColumn(
-                          label: Text("Actions"),
+          FutureBuilder(
+            future: _paymentMethodMethodAPI.get(paymentMethodsUrl),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.done &&
+                  snapshot.hasData &&
+                  !snapshot.hasError) {
+                List<PaymentMethod> methods =
+                    snapshot.data!['payment_methods'] ?? [];
+                if (methods.isEmpty) {
+                  return const Center(
+                    child: Text("No payment methods found"),
+                  );
+                }
+                return Expanded(
+                  child: SingleChildScrollView(
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: DataTable(
+                            columns: const [
+                              DataColumn(
+                                label: Text("Name"),
+                              ),
+                              DataColumn(
+                                label: Text("Description"),
+                              ),
+                              DataColumn(
+                                label: Text("Actions"),
+                              ),
+                            ],
+                            rows: methods
+                                .map(
+                                  (e) => DataRow(
+                                    cells: [
+                                      DataCell(
+                                        Row(
+                                          children: [
+                                            Padding(
+                                              padding:
+                                                  const EdgeInsets.all(8.0),
+                                              child: Text(e.name.toString()),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      DataCell(
+                                        Text(e.description.toString()),
+                                      ),
+                                      DataCell(
+                                        Row(
+                                          children: [
+                                            IconButton(
+                                              icon: const Icon(
+                                                  Icons.remove_red_eye),
+                                              onPressed: () {
+                                                showSnackBar(
+                                                    context,
+                                                    Colors.green,
+                                                    "Attach action here",
+                                                    200);
+                                              },
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                )
+                                .toList(),
+                          ),
                         ),
                       ],
-                      rows: _paymentMethods
-                          .map(
-                            (e) => DataRow(
-                              cells: [
-                                DataCell(
-                                  Row(
-                                    children: [
-                                      CircleAvatar(
-                                        backgroundImage: AssetImage(e['logo']),
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Text(e["name"]),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                DataCell(
-                                  Text(e["description"]),
-                                ),
-                                DataCell(
-                                  Row(
-                                    children: [
-                                      IconButton(
-                                        icon: const Icon(Icons.remove_red_eye),
-                                        onPressed: () {
-                                          showSnackBar(context, Colors.green,
-                                              "Attach action here", 200);
-                                        },
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          )
-                          .toList(),
                     ),
                   ),
-                ],
-              ),
-            ),
-          ),
+                );
+              }
+              return const Center(
+                child: CircularProgressIndicator.adaptive(),
+              );
+            },
+          )
         ],
       ),
     );
@@ -1027,6 +1031,7 @@ class _MpesaPaymentsSettingsBottomSheetState
                     ),
                   ],
                 ),
+                const Gap()
               ],
             ),
           ),
@@ -1117,6 +1122,123 @@ class _MpesaPaymentsSettingsBottomSheetState
               child: CircularProgressIndicator.adaptive(),
             );
           },
+        ),
+      ),
+    );
+  }
+}
+
+class AddPaymentMethodBottomSheet extends StatefulWidget {
+  const AddPaymentMethodBottomSheet({super.key});
+
+  @override
+  State<AddPaymentMethodBottomSheet> createState() =>
+      _AddPaymentMethodBottomSheetState();
+}
+
+class _AddPaymentMethodBottomSheetState
+    extends State<AddPaymentMethodBottomSheet> {
+  // keys and controllers
+  final GlobalKey<FormState> _formKey = GlobalKey();
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _descriptionController = TextEditingController();
+  // api
+  final PaymentMethodMethodAPI _paymentMethodMethodAPI =
+      PaymentMethodMethodAPI();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: const BoxDecoration(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(20),
+          topRight: Radius.circular(20),
+        ),
+        border: Border(
+          top: BorderSide(
+            color: Colors.grey,
+            width: 1,
+          ),
+          left: BorderSide(
+            color: Colors.grey,
+            width: 1,
+          ),
+          right: BorderSide(
+            color: Colors.grey,
+            width: 1,
+          ),
+        ),
+      ),
+      child: Form(
+        key: _formKey,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              "Add payment method",
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            const Gap(),
+            TextFormField(
+              controller: _nameController,
+              validator: (value) {
+                if (value!.isEmpty) {
+                  return "Payment method name is required";
+                }
+                return null;
+              },
+              decoration:
+                  const InputDecoration(hintText: "Payment method name*"),
+            ),
+            const Gap(),
+            TextFormField(
+              controller: _descriptionController,
+              decoration: const InputDecoration(hintText: "Some description"),
+            ),
+            const Gap(),
+            Row(
+              children: [
+                ElevatedButton.icon(
+                  label: const Text("Close"),
+                  icon: const Icon(Icons.close),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                ),
+                const HorizontalGap(),
+                ElevatedButton.icon(
+                  label: const Text("Save"),
+                  icon: const Icon(Icons.done),
+                  onPressed: () async {
+                    if (_formKey.currentState!.validate()) {
+                      if (_descriptionController.text.isEmpty) {
+                        _descriptionController.text = _nameController.text;
+                      }
+                      PaymentMethod method = PaymentMethod(
+                        name: _nameController.text,
+                        description: _descriptionController.text,
+                      );
+                      try {
+                        var response = await _paymentMethodMethodAPI
+                            .post(paymentMethodsUrl, body: method.toJson());
+                        if (response['status'] == "success") {
+                          showSnackBar(context, Colors.green,
+                              "Payment method added successfully", 300);
+                          Navigator.pop(context);
+                        } else {
+                          showSnackBar(
+                              context, Colors.red, "An error occurred.", 300);
+                        }
+                      } catch (e) {
+                        showSnackBar(context, Colors.red, e.toString(), 400);
+                      }
+                    }
+                  },
+                ),
+              ],
+            )
+          ],
         ),
       ),
     );
