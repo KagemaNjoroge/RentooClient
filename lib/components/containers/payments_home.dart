@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:rentoo_pms/models/payment.dart';
+import 'package:rentoo_pms/sdk/payment.dart';
 
 import '../../constants.dart';
 import '../../sdk/leases.dart';
-
 
 class PaymentsHome extends StatefulWidget {
   const PaymentsHome({super.key});
@@ -15,6 +16,7 @@ var lease = 0;
 
 class _PaymentsHomeState extends State<PaymentsHome> {
   final LeasesAPI _leasesAPI = LeasesAPI();
+  final PaymentAPI _paymentAPI = PaymentAPI();
   Widget addPaymentModal() {
     return Container(
       padding: const EdgeInsets.all(20),
@@ -102,33 +104,6 @@ class _PaymentsHomeState extends State<PaymentsHome> {
     );
   }
 
-  Widget paymentSettingsModal() {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      child: Column(
-        children: [
-          const Text(
-            "Payment settings",
-            style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(
-            height: 20,
-          ),
-          const Text("Payment settings form goes here"),
-          const SizedBox(
-            height: 20,
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            child: const Text("Close"),
-          )
-        ],
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -142,39 +117,51 @@ class _PaymentsHomeState extends State<PaymentsHome> {
                 "Payments",
                 style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
               ),
-              Row(
-                children: [
-                  ElevatedButton.icon(
-                    icon: const Icon(Icons.settings),
-                    label: const Text("Payment settings"),
-                    onPressed: () {
-                      showModalBottomSheet(
-                          context: context,
-                          builder: (context) {
-                            return paymentSettingsModal();
-                          });
-                    },
-                  ),
-                  const SizedBox(
-                    width: 10,
-                  ),
-                  ElevatedButton.icon(
-                    icon: const Icon(Icons.add),
-                    label: const Text("Add payment"),
-                    onPressed: () {
-                      showModalBottomSheet(
-                          context: context,
-                          builder: (context) {
-                            return addPaymentModal();
-                          });
-                    },
-                  )
-                ],
-              )
+              ElevatedButton.icon(
+                icon: const Icon(Icons.add),
+                label: const Text("Add payment"),
+                onPressed: () {
+                  showModalBottomSheet(
+                      context: context,
+                      builder: (context) {
+                        return addPaymentModal();
+                      });
+                },
+              ),
             ],
           ),
         ),
-    
+        Expanded(
+          child: FutureBuilder(
+            future: _paymentAPI.get(paymentsUrl),
+            builder: (context, snapshot) {
+              if (snapshot.hasData &&
+                  snapshot.connectionState == ConnectionState.done &&
+                  !snapshot.hasError) {
+                List<Payment> payments = snapshot.data!['payments'];
+                if (payments.isEmpty) {
+                  return const Center(
+                    child: Text("No payments found"),
+                  );
+                } else {
+                  List<Widget> paymentTiles = [];
+                  for (var u in payments) {
+                    paymentTiles.add(ListTile(
+                      title: Text("${u.id}"),
+                      subtitle: Text("${u.createdAt}"),
+                    ));
+                  }
+                  return Column(
+                    children: paymentTiles,
+                  );
+                }
+              }
+              return const Center(
+                child: CircularProgressIndicator.adaptive(),
+              );
+            },
+          ),
+        )
       ],
     );
   }
