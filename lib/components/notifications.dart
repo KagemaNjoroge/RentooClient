@@ -57,9 +57,13 @@ class _NotificationsModalState extends State<NotificationsModal> {
               },
             ));
           }
-          return Column(
-            mainAxisSize: MainAxisSize.min,
-            children: notifs,
+          return Expanded(
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.max,
+                children: notifs,
+              ),
+            ),
           );
         }
         return const Column(
