@@ -54,3 +54,5 @@ const propertyStatsUrl = "http://localhost:8000/stats/property-stats/";
 const mpesaPaymentSettingsUrl = "http://localhost:8000/mpesa-payment-settings/";
 const photosUrl = "http://localhost:8000/photos/";
 const houseStatsUrl = "http://localhost:8000/stats/property/";
+const paymentsUrl = "http://127.0.0.1:8000/payments/";
+const paymentMethodsUrl = "http://127.0.0.1:8000/payment-methods/";
