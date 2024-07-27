@@ -20,10 +20,12 @@ class _AddLeasesBottomSheetState extends State<AddLeasesBottomSheet> {
   final HousesAPI _housesAPI = HousesAPI();
   final TenantsAPI _tenantsAPI = TenantsAPI();
   bool _renewMonthly = true;
-  int _houseId = 0;
-  int _tenantId = 0;
+
   DateTime _startDate = DateTime.now();
   DateTime _endDate = DateTime.now();
+  final List _tenants = [];
+  int _houseId = 0;
+  int _tenantId = 0;
   // keys
   final GlobalKey<FormState> _formKey = GlobalKey();
   // controllers
@@ -67,12 +69,11 @@ class _AddLeasesBottomSheetState extends State<AddLeasesBottomSheet> {
                     context: context,
                     firstDate: DateTime.now(),
                     lastDate: DateTime(2050));
-                _startDateController.text = start.toString();
+
                 if (start != null) {
-                  _startDate = DateTime(
-                      start.start.year, start.start.month, start.start.day);
-                  _endDate =
-                      DateTime(start.end.year, start.end.month, start.end.day);
+                  _startDate = start.start.toLocal();
+                  _endDate = start.start.toLocal();
+                  _startDateController.text = "From: $_startDate to: $_endDate";
                 }
               },
               decoration: const InputDecoration(
@@ -89,6 +90,7 @@ class _AddLeasesBottomSheetState extends State<AddLeasesBottomSheet> {
                   List tenants = snapshot.data!['tenants'];
                   List<DropdownMenuItem> items = [];
                   for (var t in tenants) {
+                    _tenants.add(t);
                     items.add(
                       DropdownMenuItem(
                         value: t.id,
@@ -173,18 +175,16 @@ class _AddLeasesBottomSheetState extends State<AddLeasesBottomSheet> {
                 TextButton.icon(
                   onPressed: () async {
                     if (_formKey.currentState!.validate()) {
-                      print("House id: $_houseId");
-                      print("Tenant id: $_tenantId");
                       Lease lease = Lease(
-                        house: _houseId,
                         tenant: _tenantId,
-                        startDate: _startDate,
-                        endDate: _endDate,
+                        house: _houseId,
+                        startDate: DateTime.now(),
+                        endDate: DateTime.now(),
                         renewMonthly: _renewMonthly,
                         depositAmount: 0,
                         isActive: true,
                       );
-                      print(lease.toJson());
+
                       setState(() {
                         _isLoading = true;
                       });
@@ -310,6 +310,9 @@ class _LeasesHomeState extends State<LeasesHome> {
                   itemCount: snapshot.data!['leases'].length ?? 0,
                 ),
               );
+            }
+            if (snapshot.hasError) {
+              return Text(snapshot.error.toString());
             }
             return const Text("An error occurred");
           },
