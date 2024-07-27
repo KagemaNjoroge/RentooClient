@@ -6,6 +6,9 @@ class Payment {
   DateTime? createdAt;
   DateTime? updatedAt;
   int? lease;
+  String? notes;
+  String? paymentStatus;
+  String? referenceCode;
 
   Payment({
     this.id,
@@ -15,6 +18,9 @@ class Payment {
     this.paymentDate,
     this.paymentMethod,
     this.updatedAt,
+    this.notes,
+    this.paymentStatus,
+    this.referenceCode,
   });
 
   Payment.fromJson(Map<String, dynamic> json) {
@@ -25,6 +31,9 @@ class Payment {
     lease = json['lease'];
     paymentDate = DateTime.parse(json['payment_date']);
     paymentMethod = json['payment_method'];
+    notes = json['notes'];
+    paymentStatus = json['payment_status'];
+    referenceCode = json['reference_code'];
   }
   Map<String, dynamic> toJson() {
     return {
@@ -35,6 +44,9 @@ class Payment {
       "lease": lease,
       "payment_date": paymentDate,
       "payment_method": paymentMethod,
+      "notes": notes,
+      "reference_code": referenceCode,
+      "payment_status": paymentStatus
     };
   }
 }
