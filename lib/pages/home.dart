@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:rentoo_pms/pages/login.dart';
 
 import '../components/containers/communication.dart';
@@ -12,6 +13,7 @@ import '../components/containers/settings_home.dart';
 import '../components/containers/tenants_home.dart';
 import '../components/notifications.dart';
 import '../constants.dart';
+import '../providers/brightness.dart';
 import '../utils/snack.dart';
 
 class Home extends StatefulWidget {
@@ -133,72 +135,89 @@ class _HomeState extends State<Home> {
         padding: const EdgeInsets.all(8.0),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Padding(
-              padding: EdgeInsets.only(right: 30),
-              child: Text(
-                applicationName,
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30),
-              ),
-            ),
-            Container(
-              margin: const EdgeInsets.only(top: 3, bottom: 3),
-              height: 50,
-              width: 300,
-              child: const Expanded(
-                flex: 1,
-                child: TextField(
-                  decoration: InputDecoration(
-                    hintText: "Search",
-                    prefixIcon: Icon(Icons.search),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.all(
-                        Radius.circular(10),
+            const SizedBox(),
+            Row(
+              children: [
+                const Padding(
+                  padding: EdgeInsets.only(right: 30),
+                  child: Text(
+                    applicationName,
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30),
+                  ),
+                ),
+                Container(
+                  margin: const EdgeInsets.only(top: 3, bottom: 3),
+                  height: 50,
+                  width: 300,
+                  child: const Expanded(
+                    flex: 1,
+                    child: Expanded(
+                      child: TextField(
+                        decoration: InputDecoration(
+                          hintText: "Search",
+                          prefixIcon: Icon(Icons.search),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(10),
+                            ),
+                            borderSide: BorderSide(color: Colors.pink),
+                          ),
+                        ),
                       ),
-                      borderSide: BorderSide(color: Colors.pink),
                     ),
                   ),
                 ),
-              ),
+              ],
             ),
-            Padding(
-              padding: const EdgeInsets.only(left: 30),
-              child: IconButton(
-                tooltip: "Notifications",
-                onPressed: () {
-                  showDialog(
-                    context: context,
-                    builder: (context) {
-                      return AlertDialog(
-                        title: const Text("Notifications"),
-                        content: const NotificationsModal(),
-                        actions: [
-                          TextButton.icon(
-                            label: const Text("Close"),
-                            icon: const Icon(Icons.close),
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                          )
-                        ],
-                      );
-                    },
-                  );
-                },
-                icon: const Icon(Icons.notifications),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 30),
-              child: IconButton(
-                tooltip: "AI assistant",
-                onPressed: () {
-                  showSnackBar(
-                      context, Colors.green, "Attach action here", 300);
-                },
-                icon: const Icon(Icons.assistant),
-              ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                IconButton(
+                  tooltip: "Notifications",
+                  onPressed: () {
+                    showDialog(
+                      context: context,
+                      builder: (context) {
+                        return AlertDialog(
+                          icon: const Icon(Icons.notifications),
+                          title: const Text("Notifications"),
+                          content: const NotificationsModal(),
+                          actions: [
+                            TextButton.icon(
+                              label: const Text("Close"),
+                              icon: const Icon(Icons.close),
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                            )
+                          ],
+                        );
+                      },
+                    );
+                  },
+                  icon: const Icon(Icons.notifications),
+                ),
+                IconButton(
+                  tooltip: "AI assistant",
+                  onPressed: () {
+                    showSnackBar(
+                        context, Colors.green, "Attach action here", 300);
+                  },
+                  icon: const Icon(Icons.assistant),
+                ),
+                IconButton(
+                  tooltip: "Theme",
+                  onPressed: () {
+                    Provider.of<BrightnessProvider>(context, listen: false)
+                        .swithTheme();
+                  },
+                  icon: Provider.of<BrightnessProvider>(context).isDark
+                      ? const Icon(Icons.dark_mode)
+                      : const Icon(Icons.light_mode),
+                ),
+              ],
             ),
           ],
         ),
