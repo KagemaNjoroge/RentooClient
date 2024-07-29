@@ -3,33 +3,34 @@ class Maintenance {
   String? description;
   DateTime? requestDate;
   bool? isCompleted;
-  DateTime? completedDate;
-  int? house;
 
-  Maintenance({
-    this.id,
-    this.completedDate,
-    this.description,
-    this.house,
-    this.isCompleted,
-    this.requestDate,
-  });
+  int? house;
+  String? status;
+
+  Maintenance(
+      {this.id,
+      this.description,
+      this.house,
+      this.isCompleted,
+      this.requestDate,
+      this.status});
 
   Maintenance.fromJson(Map<String, dynamic> json) {
     id = json['id'];
-    completedDate = DateTime.parse(json['completed_date']);
+
     description = json['description'];
     house = json['house'];
     isCompleted = json['is_completed'];
-    requestDate = json['request_date'];
+    requestDate = DateTime.parse(json['request_date']);
+    status = json['status'];
   }
 
   Map<String, dynamic> toJson() => {
         "id": id,
-        "completed_date": completedDate,
         "description": description,
         "house": house,
         "is_completed": isCompleted,
-        "request_date": requestDate
+        "request_date": requestDate,
+        "status": status
       };
 }
