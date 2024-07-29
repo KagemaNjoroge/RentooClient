@@ -23,6 +23,13 @@ final List<Map<String, dynamic>> purposes = [
   },
 ];
 
+final List<Map<String, dynamic>> maintenanceRequestStatuses = [
+  {"name": "In Progress", "value": "In Progress"},
+  {"name": "Scheduled", "value": "Scheduled"},
+  {"name": "Complete", "value": "Complete"},
+  {"name": "Pending", "value": "Pending"}
+];
+
 const String applicationName = "RentooPMS";
 const String applicationLegalese =
     "Brought to you by the good folks at TomorrowAI";
@@ -56,3 +63,4 @@ const photosUrl = "http://localhost:8000/photos/";
 const houseStatsUrl = "http://localhost:8000/stats/property/";
 const paymentsUrl = "http://127.0.0.1:8000/payments/";
 const paymentMethodsUrl = "http://127.0.0.1:8000/payment-methods/";
+const maintenanceRequestsUrl = "http://localhost:8000/maintenance-request/";
