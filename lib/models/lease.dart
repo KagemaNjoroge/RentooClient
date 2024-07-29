@@ -9,18 +9,21 @@ class Lease {
   bool? renewMonthly;
   int? tenant;
   int? house;
+  bool? isPaidCompletely;
 
-  Lease(
-      {this.id,
-      this.startDate,
-      this.endDate,
-      this.depositAmount,
-      this.isActive,
-      this.createdAt,
-      this.updatedAt,
-      this.renewMonthly,
-      this.house,
-      this.tenant});
+  Lease({
+    this.id,
+    this.startDate,
+    this.endDate,
+    this.depositAmount,
+    this.isActive,
+    this.createdAt,
+    this.updatedAt,
+    this.renewMonthly,
+    this.house,
+    this.tenant,
+    this.isPaidCompletely,
+  });
 
   Map<String, dynamic> toJson() {
     return {
@@ -33,7 +36,8 @@ class Lease {
       "updated_at": updatedAt.toString(),
       "renew_monthly": renewMonthly,
       "tenant": tenant,
-      "house": house
+      "house": house,
+      "is_paid_completely": isPaidCompletely
     };
   }
 
@@ -48,5 +52,6 @@ class Lease {
     renewMonthly = json['renew_monthly'];
     tenant = json['tenant'];
     house = json['house'];
+    isPaidCompletely = json['is_paid_completely'];
   }
 }
