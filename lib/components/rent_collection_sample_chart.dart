@@ -1,6 +1,7 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:rentoo_pms/components/common/gap.dart';
+
+import 'common/gap.dart';
 
 class RentCollectionChart extends StatelessWidget {
   const RentCollectionChart({super.key, required this.isShowingMainData});
