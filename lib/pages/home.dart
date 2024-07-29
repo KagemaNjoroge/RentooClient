@@ -1,20 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:rentoo_pms/pages/login.dart';
+import 'package:rentoo_pms/components/containers/help_and_support.dart';
+import 'package:rentoo_pms/components/containers/maintenance.dart';
 
 import '../components/containers/communication.dart';
-import '../components/containers/components.dart';
 import '../components/containers/dashboard.dart';
 import '../components/containers/houses_home.dart';
 import '../components/containers/leases_home.dart';
 import '../components/containers/payments_home.dart';
 import '../components/containers/property_home.dart';
+import '../components/containers/reports.dart';
 import '../components/containers/settings_home.dart';
 import '../components/containers/tenants_home.dart';
 import '../components/notifications.dart';
 import '../constants.dart';
 import '../providers/brightness.dart';
 import '../utils/snack.dart';
+import 'login.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -48,8 +50,16 @@ class _HomeState extends State<Home> {
       label: Text("Leases"),
     ),
     const NavigationRailDestination(
+      icon: Icon(Icons.receipt_outlined),
+      label: Text("Reports"),
+    ),
+    const NavigationRailDestination(
       icon: Icon(Icons.payment),
       label: Text("Payments"),
+    ),
+    const NavigationRailDestination(
+      icon: Icon(Icons.handyman_outlined),
+      label: Text("Maintenance"),
     ),
     const NavigationRailDestination(
       icon: Icon(Icons.message),
@@ -60,8 +70,8 @@ class _HomeState extends State<Home> {
       label: Text("Settings"),
     ),
     const NavigationRailDestination(
-      icon: Icon(Icons.handyman),
-      label: Text("Components"),
+      icon: Icon(Icons.help_outline_outlined),
+      label: Text("Help & Support"),
     ),
   ];
 
@@ -73,10 +83,12 @@ class _HomeState extends State<Home> {
     const HousesHome(),
     const TenantsHome(),
     const LeasesHome(),
+    const Reports(),
     const PaymentsHome(),
+    const MaintenanceHome(),
     const Communication(),
     const SettingHome(),
-    const Components()
+    const HelpAndSupportHome()
   ];
 
   @override
