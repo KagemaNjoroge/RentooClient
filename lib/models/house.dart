@@ -50,8 +50,8 @@ class House {
       "number_of_bedrooms": numberOfBedrooms,
       "is_occupied": isOccupied,
       "rent": rent,
-      "created_at": createdAt,
-      "updated_at": updatedAt,
+      "created_at": createdAt.toString(),
+      "updated_at": updatedAt.toString(),
       "description": description,
       "property": property,
       "photos": photos
