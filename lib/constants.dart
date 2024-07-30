@@ -30,6 +30,12 @@ final List<Map<String, dynamic>> maintenanceRequestStatuses = [
   {"name": "Pending", "value": "Pending"}
 ];
 
+final List<Map<String, dynamic>> paymentStatuses = [
+  {"name": "In Progress", "value": "In progress"},
+  {"name": "Complete", "value": "Complete"},
+  {"name": "Pending", "value": "Pending"},
+  {"name": "Cancelled", "value": "Cancelled"}
+];
 const String applicationName = "RentooPMS";
 const String applicationLegalese =
     "Brought to you by the good folks at TomorrowAI";
