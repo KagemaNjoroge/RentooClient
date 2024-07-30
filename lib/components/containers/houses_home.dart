@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:rentoo_pms/components/common/gap.dart';
+import 'package:rentoo_pms/components/containers/house_details.dart';
 import 'package:rentoo_pms/utils/snack.dart';
 
 import '../../constants.dart';
@@ -307,11 +308,12 @@ class _HousesHomeState extends State<HousesHome> {
                             const Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Icon(Icons.warning, color: Colors.red),
+                                Icon(
+                                  Icons.warning,
+                                ),
                                 SizedBox(width: 10),
                                 Text(
                                   "No houses found",
-                                  style: TextStyle(color: Colors.red),
                                   textAlign: TextAlign.center,
                                   overflow: TextOverflow.ellipsis,
                                   maxLines: 2,
@@ -348,7 +350,19 @@ class _HousesHomeState extends State<HousesHome> {
                               (e) => DataRow(
                                 onSelectChanged: (value) {},
                                 cells: [
-                                  DataCell(Text(e.houseNumber.toString())),
+                                  DataCell(
+                                    TextButton(
+                                      child: Text(e.houseNumber.toString()),
+                                      onPressed: () {
+                                        showBottomSheet(
+                                            context: context,
+                                            builder: (_) {
+                                              return HouseDetails(
+                                                  houseId: e.id);
+                                            });
+                                      },
+                                    ),
+                                  ),
                                   DataCell(Text(e.property.toString())),
                                   DataCell(Text(e.rent.toString())),
                                   DataCell(Text(e.purpose.toString())),
