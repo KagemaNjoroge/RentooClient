@@ -195,7 +195,11 @@ class _HomeState extends State<Home> {
                         return AlertDialog(
                           icon: const Icon(Icons.notifications),
                           title: const Text("Notifications"),
-                          content: const NotificationsModal(),
+                          content: const SizedBox(
+                            width: 400,
+                            height: 300,
+                            child: NotificationsModal(),
+                          ),
                           actions: [
                             TextButton.icon(
                               label: const Text("Close"),
