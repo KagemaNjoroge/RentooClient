@@ -39,10 +39,10 @@ class Payment {
     return {
       "id": id,
       "amount": amount,
-      "created_at": createdAt,
-      "updated_at": updatedAt,
+      "created_at": createdAt.toString(),
+      "updated_at": updatedAt.toString(),
       "lease": lease,
-      "payment_date": paymentDate,
+      "payment_date": paymentDate.toString(),
       "payment_method": paymentMethod,
       "notes": notes,
       "reference_code": referenceCode,
