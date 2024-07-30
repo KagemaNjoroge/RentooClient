@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:rentoo_pms/models/notification.dart';
+import 'package:rentoo_pms/utils/snack.dart';
 
 import '../constants.dart';
 import '../sdk/notifications.dart';
@@ -28,7 +30,7 @@ class _NotificationsModalState extends State<NotificationsModal> {
         }
         if (snapshot.connectionState == ConnectionState.done &&
             snapshot.hasData) {
-          List notifications = snapshot.data!['notifications'];
+          List<Notifications> notifications = snapshot.data!['notifications'];
           List<Widget> notifs = [];
 
           if (notifications.isEmpty) {
@@ -45,20 +47,16 @@ class _NotificationsModalState extends State<NotificationsModal> {
           for (var x in notifications) {
             notifs.add(ListTile(
               title: Text(
-                x.title,
+                x.title ?? '',
                 style: const TextStyle(fontWeight: FontWeight.bold),
               ),
               onTap: () {
-                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                  content: Text(x.message),
-                  behavior: SnackBarBehavior.floating,
-                  width: 300,
-                ));
+                showSnackBar(context, Colors.green, x.message ?? '', 400);
               },
             ));
           }
-          return Expanded(
-            child: SingleChildScrollView(
+          return SingleChildScrollView(
+            child: Expanded(
               child: Column(
                 mainAxisSize: MainAxisSize.max,
                 children: notifs,
