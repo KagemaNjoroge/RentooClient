@@ -41,8 +41,8 @@ class Agent {
       "phone_number": phoneNumber,
       "email": email,
       "website": website,
-      "created_at": createdAt,
-      "updated_at": updatedAt,
+      "created_at": createdAt.toString(),
+      "updated_at": updatedAt.toString(),
       "properties": properties
     };
   }
