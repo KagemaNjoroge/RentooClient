@@ -409,8 +409,7 @@ class PaymentSettingsTab extends StatefulWidget {
 }
 
 class _PaymentSettingsTabState extends State<PaymentSettingsTab> {
-  final PaymentMethodMethodAPI _paymentMethodMethodAPI =
-      PaymentMethodMethodAPI();
+  final PaymentMethodAPI _paymentMethodMethodAPI = PaymentMethodAPI();
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -1143,8 +1142,7 @@ class _AddPaymentMethodBottomSheetState
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
   // api
-  final PaymentMethodMethodAPI _paymentMethodMethodAPI =
-      PaymentMethodMethodAPI();
+  final PaymentMethodAPI _paymentMethodAPI = PaymentMethodAPI();
 
   @override
   Widget build(BuildContext context) {
@@ -1220,7 +1218,7 @@ class _AddPaymentMethodBottomSheetState
                         description: _descriptionController.text,
                       );
                       try {
-                        var response = await _paymentMethodMethodAPI
+                        var response = await _paymentMethodAPI
                             .post(paymentMethodsUrl, body: method.toJson());
                         if (response['status'] == "success") {
                           showSnackBar(context, Colors.green,
