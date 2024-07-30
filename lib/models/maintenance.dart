@@ -30,7 +30,7 @@ class Maintenance {
         "description": description,
         "house": house,
         "is_completed": isCompleted,
-        "request_date": requestDate,
+        "request_date": requestDate.toString(),
         "status": status
       };
 }
