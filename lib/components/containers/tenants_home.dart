@@ -263,50 +263,91 @@ class _TenantsHomeState extends State<TenantsHome> {
             ],
           ),
         ),
-        const SizedBox(
-          height: 20,
-        ),
         FutureBuilder(
           future: _tenantsAPI.get(tenantsUrl),
           builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Center(
-                    child: CircularProgressIndicator.adaptive(),
-                  ),
-                  SizedBox(
-                    height: 20,
-                  )
-                ],
-              );
-            }
             if (snapshot.connectionState == ConnectionState.done &&
-                snapshot.hasData) {
-              return Expanded(
-                child: ListView.builder(
-                  itemBuilder: (context, index) {
-                    var tenant = snapshot.data!['tenants'][index];
-                    return ListTile(
-                      onTap: () {
-                        showSnackBar(context, Colors.green,
-                            "${tenant.firstName} ${tenant.lastName}", 300);
-                      },
-                      leading: CircleAvatar(
-                        backgroundImage: tenant.photo != null
-                            ? NetworkImage(tenant.photo!)
-                            : const AssetImage("assets/images/user_avatar.png"),
+                snapshot.hasData &&
+                !snapshot.hasError) {
+              //TODO: Add pagination
+              List<Tenant> tenants = snapshot.data!['tenants'];
+              List<DataColumn> cols = [
+                const DataColumn(
+                  label: Text("ID"),
+                ),
+                const DataColumn(
+                  label: Text("First Name"),
+                ),
+                const DataColumn(
+                  label: Text("Last Name"),
+                ),
+                const DataColumn(
+                  label: Text("Phone Number"),
+                ),
+                const DataColumn(
+                  label: Text("Property"),
+                ),
+                const DataColumn(
+                  label: Text("House Number"),
+                )
+              ];
+              List<DataRow> items = [];
+              for (var tenant in tenants) {
+                items.add(
+                  DataRow(
+                    onLongPress: () {
+                      showSnackBar(
+                          context, Colors.green, "${tenant.id} presses", 100);
+                    },
+                    cells: [
+                      DataCell(
+                        Text("${tenant.id}"),
                       ),
-                      title:
-                          Text("${snapshot.data!['tenants'][index].firstName}"),
-                    );
-                  },
-                  itemCount: snapshot.data!['tenants'].length ?? 0,
+                      DataCell(
+                        Text(tenant.firstName ?? ''),
+                      ),
+                      DataCell(
+                        Text(tenant.lastName ?? ''),
+                      ),
+                      DataCell(
+                        Text(tenant.phoneNumber ?? ''),
+                      ),
+                      const DataCell(
+                        Text("Jamhuri Flats"),
+                      ),
+                      const DataCell(
+                        Text("1234"),
+                      )
+                    ],
+                  ),
+                );
+              }
+
+              return Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    DataTable(columns: cols, rows: items),
+                  ],
                 ),
               );
             }
-            return const Text("An error occurred");
+            if (snapshot.hasError) {
+              return Center(
+                child: Text(snapshot.error.toString()),
+              );
+            }
+            return const Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Center(
+                  child: CircularProgressIndicator.adaptive(),
+                ),
+                SizedBox(
+                  height: 20,
+                )
+              ],
+            );
           },
         )
       ],
