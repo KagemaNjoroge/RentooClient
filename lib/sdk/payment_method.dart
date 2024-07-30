@@ -4,7 +4,7 @@ import 'package:file_selector/file_selector.dart';
 import '../models/payment_method.dart';
 import 'base.dart';
 
-class PaymentMethodMethodAPI implements BaseApi {
+class PaymentMethodAPI implements BaseApi {
   final Dio _dio = Dio();
   @override
   Future<Map<String, dynamic>> get(String url,
@@ -43,6 +43,7 @@ class PaymentMethodMethodAPI implements BaseApi {
           "payment_method": PaymentMethod.fromJson(response.data),
         };
       } else {
+        print(response.data);
         throw DioException(
           requestOptions: response.requestOptions,
           response: response,
