@@ -25,8 +25,8 @@ class CareTaker {
 
   Map<String, dynamic> toJson() {
     return {
-      "created_at": createdAt,
-      "updated_at": updatedAt,
+      "created_at": createdAt.toString(),
+      "updated_at": updatedAt.toString(),
       "email": email,
       "first_name": firstName,
       "last_name": lastName,
