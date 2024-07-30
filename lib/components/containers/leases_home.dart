@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:rentoo_pms/utils/dates_parser.dart';
 
 import '../../constants.dart';
+import '../../models/house.dart';
 import '../../models/lease.dart';
 import '../../sdk/leases.dart';
 import '../../sdk/property.dart';
@@ -124,7 +126,7 @@ class _AddLeasesBottomSheetState extends State<AddLeasesBottomSheet> {
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.done &&
                     snapshot.hasData) {
-                  List houses = snapshot.data!['houses'];
+                  List<House> houses = snapshot.data!['houses'];
                   List<DropdownMenuItem> items = [];
                   for (var t in houses) {
                     items.add(
@@ -262,60 +264,116 @@ class _LeasesHomeState extends State<LeasesHome> {
             ],
           ),
         ),
-        FutureBuilder(
-          future: _leasesAPI.get(leasesUrl),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Center(
-                    child: CircularProgressIndicator.adaptive(),
-                  ),
-                  SizedBox(
-                    height: 20,
-                  )
-                ],
-              );
-            }
-            if (snapshot.connectionState == ConnectionState.done &&
-                snapshot.hasData) {
-              return Expanded(
-                child: ListView.builder(
-                  itemBuilder: (context, index) {
-                    return ListTile(
-                      onTap: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content:
-                                Text("${snapshot.data!['leases'][index].id}"),
-                            behavior: SnackBarBehavior.floating,
-                            width: 300,
-                            backgroundColor: Colors.green,
-                            action: SnackBarAction(
-                              label: "Close",
-                              onPressed: () {
-                                ScaffoldMessenger.of(context).clearSnackBars();
-                              },
-                            ),
+        Expanded(
+          child: FutureBuilder(
+            future: _leasesAPI.get(leasesUrl),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Center(
+                      child: CircularProgressIndicator.adaptive(),
+                    ),
+                    SizedBox(
+                      height: 20,
+                    )
+                  ],
+                );
+              }
+              if (snapshot.connectionState == ConnectionState.done &&
+                  snapshot.hasData &&
+                  !snapshot.hasError) {
+                List<Lease> leases = snapshot.data!['leases'];
+                List<DataRow> items = [];
+                for (var lease in leases) {
+                  items.add(
+                    DataRow(
+                      cells: [
+                        DataCell(
+                          Text("${lease.id}"),
+                        ),
+                        DataCell(
+                          Text("${lease.house}"),
+                        ),
+                        DataCell(
+                          Text(parseDate(lease.startDate ?? DateTime.now())),
+                        ),
+                        DataCell(
+                          Text(parseDate(lease.endDate ?? DateTime.now())),
+                        ),
+                        DataCell(Switch(
+                          onChanged: (value) {},
+                          value: lease.isActive ?? false,
+                        )),
+                        DataCell(Switch(
+                          onChanged: (value) {},
+                          value: lease.isPaidCompletely ?? false,
+                        )),
+                        DataCell(
+                          Switch(
+                            onChanged: (value) {},
+                            value: lease.renewMonthly ?? false,
                           ),
-                        );
-                      },
-                      leading: const CircleAvatar(
-                        child: FlutterLogo(),
+                        )
+                      ],
+                    ),
+                  );
+                }
+
+                return SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      const Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Expanded(child: SizedBox()),
+                          Expanded(
+                            child: TextField(
+                              decoration: InputDecoration(
+                                hintText: "Search",
+                                icon: Icon(Icons.search),
+                              ),
+                            ),
+                          )
+                        ],
                       ),
-                      title: Text("${snapshot.data!['leases'][index].id}"),
-                    );
-                  },
-                  itemCount: snapshot.data!['leases'].length ?? 0,
-                ),
+                      DataTable(columns: const [
+                        DataColumn(
+                          label: Text("ID"),
+                        ),
+                        DataColumn(
+                          label: Text("House"),
+                        ),
+                        DataColumn(
+                          label: Text("Starts"),
+                        ),
+                        DataColumn(
+                          label: Text("Ends"),
+                        ),
+                        DataColumn(
+                          label: Text("Is Active"),
+                        ),
+                        DataColumn(
+                          label: Text("Is Paid Completely"),
+                        ),
+                        DataColumn(
+                          label: Text("Renew Monthly"),
+                        ),
+                      ], rows: items),
+                    ],
+                  ),
+                );
+              }
+              if (snapshot.hasError) {
+                return Text(snapshot.error.toString());
+              }
+              return const Center(
+                child: CircularProgressIndicator.adaptive(),
               );
-            }
-            if (snapshot.hasError) {
-              return Text(snapshot.error.toString());
-            }
-            return const Text("An error occurred");
-          },
+            },
+          ),
         )
       ],
     );
