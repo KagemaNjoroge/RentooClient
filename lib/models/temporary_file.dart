@@ -13,7 +13,7 @@ class TemporaryFile {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['id'] = id;
     data['file'] = url;
-    data['created_at'] = createdAt;
+    data['created_at'] = createdAt.toString();
     return data;
   }
 }

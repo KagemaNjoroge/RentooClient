@@ -36,8 +36,8 @@ class Property {
       "name": name,
       "address": address,
       "description": description,
-      "created_at": createdAt,
-      "updated_at": updatedAt,
+      "created_at": createdAt.toString(),
+      "updated_at": updatedAt.toString(),
       "photos": photos,
       "purpose": purpose,
     };

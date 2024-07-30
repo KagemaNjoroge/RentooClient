@@ -20,7 +20,7 @@ class Notifications {
       "id": id,
       "title": title,
       "message": message,
-      "created_at": createdAt,
+      "created_at": createdAt.toString(),
       "read": read,
       "user": user
     };
