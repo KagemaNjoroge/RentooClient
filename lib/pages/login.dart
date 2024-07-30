@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../components/common/gap.dart';
 import 'home.dart';
 
 class LoginPage extends StatefulWidget {
@@ -42,7 +43,7 @@ class _LoginPageState extends State<LoginPage> {
 }
 
 class _Logo extends StatelessWidget {
-  const _Logo({super.key});
+  const _Logo();
 
   @override
   Widget build(BuildContext context) {
@@ -118,7 +119,7 @@ class __FormContentState extends State<_FormContent> {
                 border: OutlineInputBorder(),
               ),
             ),
-            _gap(),
+            const Gap(),
             TextFormField(
               validator: (value) {
                 if (value == null || value.isEmpty) {
@@ -147,7 +148,7 @@ class __FormContentState extends State<_FormContent> {
                     },
                   )),
             ),
-            _gap(),
+            const Gap(),
             CheckboxListTile(
               value: _rememberMe,
               onChanged: (value) {
@@ -161,7 +162,7 @@ class __FormContentState extends State<_FormContent> {
               dense: true,
               contentPadding: const EdgeInsets.all(0),
             ),
-            _gap(),
+            const Gap(),
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
@@ -201,6 +202,4 @@ class __FormContentState extends State<_FormContent> {
       ),
     );
   }
-
-  Widget _gap() => const SizedBox(height: 16);
 }
