@@ -51,22 +51,33 @@ const tenantTypes = [
     "value": "Business",
   },
 ];
-
+final List<Map<String, String>> maintainerTypes = [
+  {
+    "name": "Individual",
+    "value": "Individual",
+  },
+  {
+    "name": "Company",
+    "value": "Company",
+  }
+];
 //endpoints
-const companyUrl = "http://localhost:8000/company/";
-const propertyUrl = "http://localhost:8000/properties/";
-const housesUrl = "http://localhost:8000/houses/";
-const tenantsUrl = "http://localhost:8000/tenants/";
-const leasesUrl = "http://localhost:8000/leases/";
-const notificationsUrl = "http://localhost:8000/notifications/";
-const unitsUrl = 'http://localhost:8000/units/';
-const agentsUrl = "http://localhost:8000/agents/";
-const usersUrl = "http://localhost:8000/users/";
-const tempUrl = "http://localhost:8000/temporary-files/";
-const propertyStatsUrl = "http://localhost:8000/stats/property-stats/";
-const mpesaPaymentSettingsUrl = "http://localhost:8000/mpesa-payment-settings/";
-const photosUrl = "http://localhost:8000/photos/";
-const houseStatsUrl = "http://localhost:8000/stats/property/";
-const paymentsUrl = "http://127.0.0.1:8000/payments/";
-const paymentMethodsUrl = "http://127.0.0.1:8000/payment-methods/";
-const maintenanceRequestsUrl = "http://localhost:8000/maintenance-request/";
+const server = "http://localhost:8000";
+const companyUrl = "$server/company/";
+const propertyUrl = "$server/properties/";
+const housesUrl = "$server/houses/";
+const tenantsUrl = "$server/tenants/";
+const leasesUrl = "$server/leases/";
+const notificationsUrl = "$server/notifications/";
+const unitsUrl = '$server/units/';
+const agentsUrl = "$server/agents/";
+const usersUrl = "$server/users/";
+const tempUrl = "$server/temporary-files/";
+const propertyStatsUrl = "$server/stats/property-stats/";
+const mpesaPaymentSettingsUrl = "$server/mpesa-payment-settings/";
+const photosUrl = "$server/photos/";
+const houseStatsUrl = "$server/stats/property/";
+const paymentsUrl = "$server/payments/";
+const paymentMethodsUrl = "$server/payment-methods/";
+const maintenanceRequestsUrl = "$server/maintenance-request/";
+const maintainersUrl = "$server/maintainers/";
