@@ -240,7 +240,7 @@ class _TenantsHomeState extends State<TenantsHome> {
                           });
                     },
                     label: const Text("Add Tenant"),
-                    icon: const Icon(Icons.add),
+                    icon: const Icon(Icons.person_add_alt_1_outlined),
                   ),
                   const HorizontalGap(),
                   IconButton(

@@ -629,7 +629,7 @@ class _UserSettingsTabState extends State<UserSettingsTab> {
                     },
                   );
                 },
-                icon: const Icon(Icons.add),
+                icon: const Icon(Icons.person_add_alt_1_outlined),
                 label: const Text("Add User"),
               ),
               Container(
@@ -695,13 +695,10 @@ class _UserSettingsTabState extends State<UserSettingsTab> {
                                     ),
                                     DataCell(
                                         Text(user.isStaff! ? "Admin" : "User")),
-                                    DataCell(
-                                      Radio(
-                                        value: user.isActive,
-                                        groupValue: user.isActive,
-                                        onChanged: (val) {},
-                                      ),
-                                    ),
+                                    DataCell(Checkbox(
+                                      onChanged: (val) {},
+                                      value: user.isActive,
+                                    )),
                                     DataCell(
                                       Row(
                                         children: [
