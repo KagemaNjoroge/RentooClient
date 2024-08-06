@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:rentoo_pms/models/notification.dart';
-import 'package:rentoo_pms/utils/snack.dart';
 
 import '../constants.dart';
+import '../models/notification.dart';
 import '../sdk/notifications.dart';
+import '../utils/snack.dart';
 
 class NotificationsModal extends StatefulWidget {
   const NotificationsModal({super.key});
