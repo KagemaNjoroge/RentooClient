@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:rentoo_pms/components/common/gap.dart';
-import 'package:rentoo_pms/components/containers/house_details.dart';
-import 'package:rentoo_pms/utils/snack.dart';
 
 import '../../constants.dart';
 import '../../models/house.dart';
 import '../../sdk/property.dart';
+import '../../utils/snack.dart';
+import '../common/gap.dart';
+import 'house_details.dart';
 
 class AddHouseBottomSheet extends StatefulWidget {
   const AddHouseBottomSheet({super.key});
