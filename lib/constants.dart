@@ -81,3 +81,4 @@ const paymentsUrl = "$server/payments/";
 const paymentMethodsUrl = "$server/payment-methods/";
 const maintenanceRequestsUrl = "$server/maintenance-request/";
 const maintainersUrl = "$server/maintainers/";
+const loginUrl = "$server/login/";
