@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:rentoo_pms/providers/auth_provider.dart';
 
 import '../components/containers/communication.dart';
 import '../components/containers/dashboard.dart';
@@ -15,6 +14,7 @@ import '../components/containers/settings_home.dart';
 import '../components/containers/tenants_home.dart';
 import '../components/notifications.dart';
 import '../constants.dart';
+import '../providers/auth_provider.dart';
 import '../providers/brightness.dart';
 import '../utils/snack.dart';
 import 'login.dart';
