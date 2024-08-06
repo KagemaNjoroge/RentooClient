@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:rentoo_pms/components/containers/help_and_support.dart';
-import 'package:rentoo_pms/components/containers/maintenance.dart';
+import 'package:rentoo_pms/providers/auth_provider.dart';
 
 import '../components/containers/communication.dart';
 import '../components/containers/dashboard.dart';
+import '../components/containers/help_and_support.dart';
 import '../components/containers/houses_home.dart';
 import '../components/containers/leases_home.dart';
+import '../components/containers/maintenance.dart';
 import '../components/containers/payments_home.dart';
 import '../components/containers/property_home.dart';
 import '../components/containers/reports.dart';
@@ -28,6 +29,7 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   // state
   bool _railExpanded = false;
+  bool _isLoading = false;
   List<NavigationRailDestination> destinations = [
     const NavigationRailDestination(
       icon: Icon(Icons.home),
@@ -108,8 +110,15 @@ class _HomeState extends State<Home> {
               extended: _railExpanded,
               trailing: IconButton(
                 tooltip: "Logout",
-                icon: const Icon(Icons.logout),
-                onPressed: () {
+                icon: _isLoading
+                    ? const CircularProgressIndicator.adaptive()
+                    : const Icon(Icons.logout),
+                onPressed: () async {
+                  setState(() {
+                    _isLoading = true;
+                  });
+                  await Provider.of<AuthProvider>(context, listen: false)
+                      .removeCredentials();
                   Navigator.of(context).push(
                     MaterialPageRoute(
                       builder: (context) {
