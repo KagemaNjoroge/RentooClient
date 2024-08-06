@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:rentoo_pms/components/rent_collection_sample_chart.dart';
-import 'package:rentoo_pms/models/stats/property_stats.dart';
-import 'package:rentoo_pms/sdk/stats/property_stats.dart';
-import 'package:rentoo_pms/utils/snack.dart';
 
 import '../../constants.dart';
+import '../../models/stats/property_stats.dart';
+import '../../sdk/stats/property_stats.dart';
+import '../../utils/snack.dart';
+import '../rent_collection_sample_chart.dart';
 
 class RecentMessages extends StatelessWidget {
   final List<Message> messages;
