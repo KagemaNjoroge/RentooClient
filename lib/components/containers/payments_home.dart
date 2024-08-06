@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:rentoo_pms/models/payment_method.dart';
-import 'package:rentoo_pms/sdk/payment_method.dart';
-import 'package:rentoo_pms/utils/snack.dart';
 
 import '../../constants.dart';
 import '../../models/lease.dart';
 import '../../models/payment.dart';
+import '../../models/payment_method.dart';
 import '../../sdk/leases.dart';
 import '../../sdk/payment.dart';
+import '../../sdk/payment_method.dart';
 import '../../utils/dates_parser.dart';
+import '../../utils/snack.dart';
 import '../common/gap.dart';
 
 class PaymentsHome extends StatefulWidget {
