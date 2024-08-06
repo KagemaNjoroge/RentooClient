@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:rentoo_pms/pages/login.dart';
-import 'package:rentoo_pms/providers/auth_provider.dart';
 
 import 'constants.dart';
 import 'pages/home.dart';
+import 'pages/login.dart';
+import 'providers/auth_provider.dart';
 import 'providers/brightness.dart';
 
 void main() {
