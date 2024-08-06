@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:rentoo_pms/pages/login.dart';
+import 'package:rentoo_pms/providers/auth_provider.dart';
 
 import 'constants.dart';
 import 'pages/home.dart';
@@ -14,22 +16,70 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider<BrightnessProvider>(
-      create: (_) => BrightnessProvider(),
-      builder: (context, child) {
-        return MaterialApp(
-          theme: ThemeData(
-            colorSchemeSeed: kPrimaryColor,
-            useMaterial3: true,
-            brightness: Provider.of<BrightnessProvider>(context).isDark
-                ? Brightness.dark
-                : Brightness.light,
-          ),
-          debugShowCheckedModeBanner: false,
-          title: applicationName,
-          home: const Home(),
-        );
-      },
+// inject credentials provider
+    return ChangeNotifierProvider(
+      create: (_) => AuthProvider(),
+      // inject brightness provider for toggling between light and dark modes
+      builder: (_, child) => ChangeNotifierProvider<BrightnessProvider>(
+        create: (_) => BrightnessProvider(),
+        builder: (context, child) {
+          return FutureBuilder(
+            future: Provider.of<AuthProvider>(context, listen: false)
+                .getCredentials(),
+            builder: (context, snapshot) {
+              if (snapshot.hasError) {
+                return MaterialApp(
+                  home: const LoginPage(),
+                  theme: ThemeData(
+                    colorSchemeSeed: kPrimaryColor,
+                    useMaterial3: true,
+                    brightness: Provider.of<BrightnessProvider>(context).isDark
+                        ? Brightness.dark
+                        : Brightness.light,
+                  ),
+                  debugShowCheckedModeBanner: false,
+                  title: applicationName,
+                );
+              }
+              if (!snapshot.hasError &&
+                  snapshot.connectionState == ConnectionState.done &&
+                  snapshot.hasData) {
+                AuthCredentials? credentials = snapshot.data;
+                if (credentials != null && credentials.token != null) {
+                  return MaterialApp(
+                    theme: ThemeData(
+                      colorSchemeSeed: kPrimaryColor,
+                      useMaterial3: true,
+                      brightness:
+                          Provider.of<BrightnessProvider>(context).isDark
+                              ? Brightness.dark
+                              : Brightness.light,
+                    ),
+                    debugShowCheckedModeBanner: false,
+                    title: applicationName,
+                    home: const Home(),
+                  );
+                } else {
+                  return MaterialApp(
+                    home: const LoginPage(),
+                    theme: ThemeData(
+                      colorSchemeSeed: kPrimaryColor,
+                      useMaterial3: true,
+                      brightness:
+                          Provider.of<BrightnessProvider>(context).isDark
+                              ? Brightness.dark
+                              : Brightness.light,
+                    ),
+                    debugShowCheckedModeBanner: false,
+                    title: applicationName,
+                  );
+                }
+              }
+              return const Center(child: CircularProgressIndicator.adaptive());
+            },
+          );
+        },
+      ),
     );
   }
 }
