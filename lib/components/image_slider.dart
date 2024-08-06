@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:rentoo_pms/constants.dart';
+
+import '../constants.dart';
 
 class ImageSlider extends StatefulWidget {
   final List<String> imagePaths;
