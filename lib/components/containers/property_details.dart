@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:rentoo_pms/components/common/gap.dart';
-import 'package:rentoo_pms/components/image_slider.dart';
-import 'package:rentoo_pms/constants.dart';
-import 'package:rentoo_pms/models/photo.dart';
-import 'package:rentoo_pms/models/property.dart';
-import 'package:rentoo_pms/sdk/property.dart';
+import 'package:provider/provider.dart';
+
+import '../../constants.dart';
+import '../../models/photo.dart';
+import '../../models/property.dart';
+import '../../providers/destination_provider.dart';
+import '../../sdk/photos.dart';
+import '../../sdk/property.dart';
+import '../common/gap.dart';
+import '../image_slider.dart';
 
 class PropertyDetailsBottomSheet extends StatefulWidget {
   int propertyId;
@@ -19,116 +23,155 @@ class _PropertyDetailsBottomSheetState
     extends State<PropertyDetailsBottomSheet> {
   final PropertyAPI _propertyAPI = PropertyAPI();
   final HousesAPI _housesAPI = HousesAPI();
+  final PhotosAPI _photosAPI = PhotosAPI();
+
+  final List<String> _imagePaths = [];
+  //List<XFile> _selectedPhotos = [];
+
+  Future<void> _fetctImageUrls(List<dynamic> imageIds) async {
+    for (var i in imageIds) {
+      var uri = "$photosUrl$i/";
+      try {
+        var response = await _photosAPI.getItem(uri);
+        if (response['status'] == 'success') {
+          Photo photo = response['photo'];
+          _imagePaths.add(photo.image ?? '');
+        }
+      } catch (e) {
+        throw Exception(e.toString());
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(20),
-      decoration: const BoxDecoration(
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(20),
-          topRight: Radius.circular(20),
-        ),
-        border: Border(
-          top: BorderSide(
-            color: Colors.grey,
-            width: 1,
-          ),
-          left: BorderSide(
-            color: Colors.grey,
-            width: 1,
-          ),
-          right: BorderSide(
-            color: Colors.grey,
-            width: 1,
-          ),
-        ),
-      ),
-      child: FutureBuilder(
-        future: _propertyAPI.getItem("$propertyUrl${widget.propertyId}/"),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.done &&
-              !snapshot.hasError) {
-            Property property = snapshot.data!['property'];
-            List<String> imagePaths = [];
-            List<Photo> photos = [];
-
-            for (var ph in property.photos ?? []) {
-              photos.add(Photo.fromJson(ph));
-            }
-
-            for (var p in photos) {
-              imagePaths.add(p.image ?? '');
-            }
-
-            return Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      "${property.name}",
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 20,
-                      ),
-                    ),
-                    IconButton(
-                      onPressed: () async {
-                        Navigator.pop(context);
-                      },
-                      icon: const Icon(Icons.close),
-                    ),
-                  ],
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                "Property Details",
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 20,
                 ),
-                const Text("This property is located at:"),
-                Text(
-                  "${property.address}",
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 20,
+              ),
+              Row(
+                children: [
+                  IconButton(
+                    onPressed: () {},
+                    icon: const Icon(Icons.edit_outlined),
+                    tooltip: "Edit Property Details",
                   ),
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Gap(),
-                    imagePaths.isNotEmpty
-                        ? ImageSlider(imagePaths: imagePaths)
-                        : const SizedBox(),
-                    const Gap(),
-                    const Text("Extra info:"),
-                    Text("${property.description}"),
-                    const Text("Houses in this property"),
-                    FutureBuilder(
-                      future: _housesAPI.get("$houseStatsUrl${property.id}/"),
-                      builder: (context, snapshot) {
-                        if (snapshot.hasError) {
-                          return const Text("An error occurred");
-                        }
-                        if (snapshot.connectionState == ConnectionState.done &&
-                            snapshot.hasData) {
-                          var houses = snapshot.data!['houses'];
+                  const HorizontalGap(),
+                  IconButton(
+                    onPressed: () {
+                      Provider.of<DestinationProvider>(context, listen: false)
+                          .setData(0);
+                      Provider.of<DestinationProvider>(context, listen: false)
+                          .changeDestination(1);
+                    },
+                    icon: const Icon(Icons.close),
+                    tooltip: "Close",
+                  ),
+                ],
+              ),
+            ],
+          ),
+          const Divider(),
+          FutureBuilder(
+            future: _propertyAPI.getItem("$propertyUrl${widget.propertyId}/"),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.done &&
+                  !snapshot.hasError) {
+                Property property = snapshot.data!['property'];
 
-                          return Text("${houses.length}");
-                        }
-                        return const Center(
-                          child: CircularProgressIndicator.adaptive(),
-                        );
-                      },
-                    )
-                  ],
-                ),
-              ],
-            );
-          }
-          return const Center(
-            child: CircularProgressIndicator.adaptive(),
-          );
-        },
+                return Expanded(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            const Icon(
+                              Icons.location_on,
+                              color: kPrimaryColor,
+                            ),
+                            Text(
+                              "${property.address}",
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 15,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const Gap(),
+                        Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            FutureBuilder(
+                              future: _fetctImageUrls(property.photos ?? []),
+                              builder: (context, snapshot) {
+                                if (snapshot.connectionState ==
+                                        ConnectionState.done &&
+                                    !snapshot.hasError) {
+                                  if (_imagePaths.isNotEmpty) {
+                                    return ImageSlider(
+                                      imagePaths: _imagePaths,
+                                    );
+                                  }
+                                }
+                                return const SizedBox();
+                              },
+                            ),
+                            const Gap(),
+                            const Text(
+                              "Extra info:",
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Text("${property.description}"),
+                            const Text("Houses in this property"),
+                            FutureBuilder(
+                              future: _housesAPI
+                                  .get("$houseStatsUrl${property.id}/"),
+                              builder: (context, snapshot) {
+                                if (snapshot.hasError) {
+                                  return const Text("An error occurred");
+                                }
+                                if (snapshot.connectionState ==
+                                        ConnectionState.done &&
+                                    snapshot.hasData) {
+                                  var houses = snapshot.data!['houses'];
+
+                                  return Text("${houses.length}");
+                                }
+                                return const Center(
+                                  child: CircularProgressIndicator.adaptive(),
+                                );
+                              },
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              }
+              return const Center(
+                child: CircularProgressIndicator.adaptive(),
+              );
+            },
+          ),
+        ],
       ),
     );
   }

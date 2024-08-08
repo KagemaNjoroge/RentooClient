@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:file_selector/file_selector.dart';
 
-import '../models/maintenance.dart';
+import '../models/maintenance_request.dart';
 import 'base.dart';
 
 class MaintenanceRequestAPI implements BaseApi {
@@ -14,9 +14,9 @@ class MaintenanceRequestAPI implements BaseApi {
       final response = await _dio.get(url, queryParameters: queryParameters);
 
       if (response.statusCode == 200) {
-        var maintenance = <Maintenance>[];
+        var maintenance = <MaintenanceRequest>[];
         for (var prop in response.data) {
-          maintenance.add(Maintenance.fromJson(prop));
+          maintenance.add(MaintenanceRequest.fromJson(prop));
         }
 
         return {
@@ -43,7 +43,7 @@ class MaintenanceRequestAPI implements BaseApi {
       if (response.statusCode == 201) {
         return {
           "status": "success",
-          "maintenance": Maintenance.fromJson(response.data),
+          "maintenance": MaintenanceRequest.fromJson(response.data),
         };
       } else {
         throw DioException(
@@ -65,7 +65,7 @@ class MaintenanceRequestAPI implements BaseApi {
       if (response.statusCode == 200) {
         return {
           "status": "success",
-          "maintenance": Maintenance.fromJson(response.data),
+          "maintenance": MaintenanceRequest.fromJson(response.data),
         };
       } else {
         throw DioException(
@@ -108,7 +108,7 @@ class MaintenanceRequestAPI implements BaseApi {
       if (response.statusCode == 200) {
         return {
           "status": "success",
-          "maintenance": Maintenance.fromJson(response.data),
+          "maintenance": MaintenanceRequest.fromJson(response.data),
         };
       } else {
         throw DioException(

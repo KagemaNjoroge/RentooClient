@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../../constants.dart';
 import '../../models/house.dart';
+import '../../providers/destination_provider.dart';
 import '../../sdk/property.dart';
 import '../../utils/snack.dart';
 import '../common/gap.dart';
@@ -237,8 +239,35 @@ class HousesHome extends StatefulWidget {
 }
 
 class _HousesHomeState extends State<HousesHome> {
-  final HousesAPI _housesAPI = HousesAPI();
+  @override
+  Widget build(BuildContext context) {
+    return ChangeNotifierProvider(
+        create: (_) => DestinationProvider(),
+        builder: (context, child) {
+          List<Widget> destinations = [
+            const HousesMainView(),
+            HouseDetails(
+                houseId: Provider.of<DestinationProvider>(context).data_)
+          ];
+          if (Provider.of<DestinationProvider>(context).data_ != 0) {
+            return destinations[
+                Provider.of<DestinationProvider>(context).destination];
+          } else {
+            return destinations[0];
+          }
+        });
+  }
+}
 
+class HousesMainView extends StatefulWidget {
+  const HousesMainView({super.key});
+
+  @override
+  State<HousesMainView> createState() => _HousesMainViewState();
+}
+
+class _HousesMainViewState extends State<HousesMainView> {
+  final HousesAPI _housesAPI = HousesAPI();
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -300,7 +329,7 @@ class _HousesHomeState extends State<HousesHome> {
                   }
                   if (snapshot.connectionState == ConnectionState.done &&
                       snapshot.hasData) {
-                    List houses = snapshot.data!['houses'];
+                    List<House> houses = snapshot.data!['houses'];
                     if (houses.isEmpty) {
                       return Center(
                         child: Column(
@@ -311,7 +340,7 @@ class _HousesHomeState extends State<HousesHome> {
                                 Icon(
                                   Icons.warning,
                                 ),
-                                SizedBox(width: 10),
+                                HorizontalGap(),
                                 Text(
                                   "No houses found",
                                   textAlign: TextAlign.center,
@@ -320,7 +349,7 @@ class _HousesHomeState extends State<HousesHome> {
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 20),
+                            const Gap(),
                             ElevatedButton.icon(
                               onPressed: () {
                                 showBottomSheet(
@@ -354,12 +383,14 @@ class _HousesHomeState extends State<HousesHome> {
                                     TextButton(
                                       child: Text(e.houseNumber.toString()),
                                       onPressed: () {
-                                        showBottomSheet(
-                                            context: context,
-                                            builder: (_) {
-                                              return HouseDetails(
-                                                  houseId: e.id);
-                                            });
+                                        Provider.of<DestinationProvider>(
+                                                context,
+                                                listen: false)
+                                            .setData(e.id);
+                                        Provider.of<DestinationProvider>(
+                                                context,
+                                                listen: false)
+                                            .changeDestination(1);
                                       },
                                     ),
                                   ),

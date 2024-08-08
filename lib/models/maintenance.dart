@@ -1,36 +1,39 @@
 class Maintenance {
   int? id;
-  String? description;
-  DateTime? requestDate;
-  bool? isCompleted;
+  int? request;
+  int? maintainer;
+  double? cost;
+  DateTime? dateDone;
+  String? comments;
+  bool? isDone;
 
-  int? house;
-  String? status;
-
-  Maintenance(
-      {this.id,
-      this.description,
-      this.house,
-      this.isCompleted,
-      this.requestDate,
-      this.status});
-
+  Maintenance({
+    this.comments,
+    this.cost,
+    this.dateDone,
+    this.id,
+    this.isDone,
+    this.maintainer,
+    this.request,
+  });
   Maintenance.fromJson(Map<String, dynamic> json) {
     id = json['id'];
-
-    description = json['description'];
-    house = json['house'];
-    isCompleted = json['is_completed'];
-    requestDate = DateTime.parse(json['request_date']);
-    status = json['status'];
+    comments = json['comments'];
+    cost = double.parse(json['cost']);
+    dateDone = DateTime.parse(json['date_done']);
+    maintainer = json['maintainer'];
+    request = json['request'];
+    isDone = json['is_done'];
   }
-
-  Map<String, dynamic> toJson() => {
-        "id": id,
-        "description": description,
-        "house": house,
-        "is_completed": isCompleted,
-        "request_date": requestDate.toString(),
-        "status": status
-      };
+  Map<String, dynamic> toJson() {
+    return {
+      "id": id,
+      "comments": comments,
+      "cost": cost,
+      "date_done": dateDone,
+      "is_done": isDone,
+      "request": request,
+      "maintainer": maintainer
+    };
+  }
 }

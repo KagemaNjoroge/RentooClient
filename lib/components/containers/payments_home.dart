@@ -9,6 +9,8 @@ import '../../sdk/payment.dart';
 import '../../sdk/payment_method.dart';
 import '../../utils/dates_parser.dart';
 import '../../utils/snack.dart';
+import '../common/buttons/export_csv_button.dart';
+import '../common/buttons/export_pdf_button.dart';
 import '../common/gap.dart';
 
 class PaymentsHome extends StatefulWidget {
@@ -59,16 +61,24 @@ class _PaymentsHomeState extends State<PaymentsHome> {
                 "Payments",
                 style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
               ),
-              ElevatedButton.icon(
-                icon: const Icon(Icons.add),
-                label: const Text("Add payment"),
-                onPressed: () {
-                  showModalBottomSheet(
-                      context: context,
-                      builder: (context) {
-                        return const AddPaymentBottomSheet();
-                      });
-                },
+              Row(
+                children: [
+                  ElevatedButton.icon(
+                    icon: const Icon(Icons.add),
+                    label: const Text("Add payment"),
+                    onPressed: () {
+                      showModalBottomSheet(
+                          context: context,
+                          builder: (context) {
+                            return const AddPaymentBottomSheet();
+                          });
+                    },
+                  ),
+                  const HorizontalGap(),
+                  ExportCsvButton(),
+                  const HorizontalGap(),
+                  ExportPdfButton()
+                ],
               ),
             ],
           ),

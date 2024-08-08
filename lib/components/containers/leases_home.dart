@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:rentoo_pms/utils/dates_parser.dart';
 
 import '../../constants.dart';
 import '../../models/house.dart';
@@ -7,7 +6,10 @@ import '../../models/lease.dart';
 import '../../sdk/leases.dart';
 import '../../sdk/property.dart';
 import '../../sdk/tenants.dart';
+import '../../utils/dates_parser.dart';
 import '../../utils/snack.dart';
+import '../common/buttons/export_csv_button.dart';
+import '../common/buttons/export_pdf_button.dart';
 import '../common/gap.dart';
 
 class AddLeasesBottomSheet extends StatefulWidget {
@@ -157,13 +159,14 @@ class _AddLeasesBottomSheetState extends State<AddLeasesBottomSheet> {
               },
             ),
             const Gap(),
-            SwitchListTile(
-              value: _renewMonthly,
-              onChanged: (value) {
-                _renewMonthly = value;
-              },
-              title: const Text("Renew Monthly"),
-            ),
+            CheckboxListTile.adaptive(
+                title: const Text("Renew montly"),
+                value: _renewMonthly,
+                onChanged: (val) {
+                  setState(() {
+                    _renewMonthly = val!;
+                  });
+                }),
             const Gap(),
             Row(
               children: [
@@ -235,6 +238,20 @@ class LeasesHome extends StatefulWidget {
 class _LeasesHomeState extends State<LeasesHome> {
   final LeasesAPI _leasesAPI = LeasesAPI();
 
+  Widget _parseStatus(bool status) {
+    if (status) {
+      return const Icon(
+        Icons.verified,
+        color: Colors.blue,
+      );
+    } else {
+      return const Icon(
+        Icons.dangerous_outlined,
+        color: Colors.red,
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -251,15 +268,28 @@ class _LeasesHomeState extends State<LeasesHome> {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              ElevatedButton.icon(
-                onPressed: () {
-                  showBottomSheet(
-                    context: context,
-                    builder: (context) => const AddLeasesBottomSheet(),
-                  );
-                },
-                label: const Text("Add Lease"),
-                icon: const Icon(Icons.add),
+              Row(
+                children: [
+                  ElevatedButton.icon(
+                    onPressed: () {
+                      showBottomSheet(
+                        context: context,
+                        builder: (context) => const AddLeasesBottomSheet(),
+                      );
+                    },
+                    label: const Text("Add Lease"),
+                    icon: const Icon(Icons.add),
+                  ),
+                  const HorizontalGap(),
+                  ExportCsvButton(),
+                  const HorizontalGap(),
+                  ExportPdfButton(
+                    callBack: () {
+                      showSnackBar(
+                          context, kPrimaryColor, "Export as PDF", 200);
+                    },
+                  ),
+                ],
               ),
             ],
           ),
@@ -291,9 +321,6 @@ class _LeasesHomeState extends State<LeasesHome> {
                     DataRow(
                       cells: [
                         DataCell(
-                          Text("${lease.id}"),
-                        ),
-                        DataCell(
                           Text("${lease.house}"),
                         ),
                         DataCell(
@@ -302,20 +329,10 @@ class _LeasesHomeState extends State<LeasesHome> {
                         DataCell(
                           Text(parseDate(lease.endDate ?? DateTime.now())),
                         ),
-                        DataCell(Switch(
-                          onChanged: (value) {},
-                          value: lease.isActive ?? false,
-                        )),
-                        DataCell(Switch(
-                          onChanged: (value) {},
-                          value: lease.isPaidCompletely ?? false,
-                        )),
-                        DataCell(
-                          Switch(
-                            onChanged: (value) {},
-                            value: lease.renewMonthly ?? false,
-                          ),
-                        )
+                        const DataCell(Text("2,000")),
+                        DataCell(_parseStatus(lease.isActive ?? false)),
+                        DataCell(_parseStatus(lease.isPaidCompletely ?? false)),
+                        DataCell(_parseStatus(lease.renewMonthly ?? false))
                       ],
                     ),
                   );
@@ -341,9 +358,6 @@ class _LeasesHomeState extends State<LeasesHome> {
                       ),
                       DataTable(columns: const [
                         DataColumn(
-                          label: Text("ID"),
-                        ),
-                        DataColumn(
                           label: Text("House"),
                         ),
                         DataColumn(
@@ -352,6 +366,7 @@ class _LeasesHomeState extends State<LeasesHome> {
                         DataColumn(
                           label: Text("Ends"),
                         ),
+                        DataColumn(label: Text("Rent")),
                         DataColumn(
                           label: Text("Is Active"),
                         ),

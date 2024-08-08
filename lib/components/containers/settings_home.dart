@@ -652,7 +652,28 @@ class _UserSettingsTabState extends State<UserSettingsTab> {
             child: FutureBuilder(
               builder: (context, snapshot) {
                 if (snapshot.hasError) {
-                  return Text(snapshot.error.toString());
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.error_outline),
+                          HorizontalGap(),
+                          Text("An error occurred."),
+                        ],
+                      ),
+                      const Gap(),
+                      ElevatedButton.icon(
+                        onPressed: () {
+                          setState(() {});
+                        },
+                        label: const Text("Try again"),
+                        icon: const Icon(Icons.refresh_sharp),
+                      )
+                    ],
+                  );
                 }
                 if (snapshot.hasData &&
                     snapshot.connectionState == ConnectionState.done) {

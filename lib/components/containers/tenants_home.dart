@@ -1,19 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../../constants.dart';
 import '../../models/tenant.dart';
+import '../../providers/destination_provider.dart';
 import '../../sdk/tenants.dart';
 import '../../utils/snack.dart';
 import '../common/gap.dart';
+import 'tenant_details.dart';
 
-class TenantsHome extends StatefulWidget {
-  const TenantsHome({super.key});
+class TenantsMainView extends StatefulWidget {
+  const TenantsMainView({super.key});
 
   @override
-  State<TenantsHome> createState() => _TenantsHomeState();
+  State<TenantsMainView> createState() => _TenantsMainViewState();
 }
 
-class _TenantsHomeState extends State<TenantsHome> {
+class _TenantsMainViewState extends State<TenantsMainView> {
   bool _isLoading = false;
 
   List<DropdownMenuItem> _tenantsTypes() {
@@ -37,6 +40,8 @@ class _TenantsHomeState extends State<TenantsHome> {
   final TextEditingController _websiteController = TextEditingController();
 // keys
   final GlobalKey<FormState> _formKey = GlobalKey();
+
+  final TenantsAPI _tenantsAPI = TenantsAPI();
 
   Widget _addTenantModal() {
     return Container(
@@ -212,7 +217,6 @@ class _TenantsHomeState extends State<TenantsHome> {
     );
   }
 
-  final TenantsAPI _tenantsAPI = TenantsAPI();
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -295,9 +299,14 @@ class _TenantsHomeState extends State<TenantsHome> {
               for (var tenant in tenants) {
                 items.add(
                   DataRow(
-                    onLongPress: () {
-                      showSnackBar(
-                          context, Colors.green, "${tenant.id} presses", 100);
+                    onSelectChanged: (val) {
+                      if (val!) {
+                        // set provider data
+                        Provider.of<DestinationProvider>(context, listen: false)
+                            .setData(tenant.id);
+                        Provider.of<DestinationProvider>(context, listen: false)
+                            .changeDestination(1);
+                      }
                     },
                     cells: [
                       DataCell(
@@ -327,7 +336,11 @@ class _TenantsHomeState extends State<TenantsHome> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    DataTable(columns: cols, rows: items),
+                    DataTable(
+                      columns: cols,
+                      rows: items,
+                      showCheckboxColumn: false,
+                    ),
                   ],
                 ),
               );
@@ -351,6 +364,31 @@ class _TenantsHomeState extends State<TenantsHome> {
           },
         )
       ],
+    );
+  }
+}
+
+class TenantsHome extends StatefulWidget {
+  const TenantsHome({super.key});
+
+  @override
+  State<TenantsHome> createState() => _TenantsHomeState();
+}
+
+class _TenantsHomeState extends State<TenantsHome> {
+  @override
+  Widget build(BuildContext context) {
+    return ChangeNotifierProvider(
+      create: (_) => DestinationProvider(),
+      builder: (context, child) {
+        List<Widget> destinantions = [
+          const TenantsMainView(),
+          TenantDetails(
+              tenantID: Provider.of<DestinationProvider>(context).data_)
+        ];
+        return destinantions[
+            Provider.of<DestinationProvider>(context).destination];
+      },
     );
   }
 }

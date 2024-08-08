@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -27,6 +29,14 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  Future<void> logout() async {
+    // clear theme data
+    await Provider.of<BrightnessProvider>(context, listen: false)
+        .removeThemeData();
+    // clear shared preferences
+    await Provider.of<AuthProvider>(context, listen: false).removeCredentials();
+  }
+
   // state
   bool _railExpanded = false;
   bool _isLoading = false;
@@ -112,13 +122,13 @@ class _HomeState extends State<Home> {
                 tooltip: "Logout",
                 icon: _isLoading
                     ? const CircularProgressIndicator.adaptive()
-                    : const Icon(Icons.logout),
+                    : const Icon(Icons.logout_sharp),
                 onPressed: () async {
                   setState(() {
                     _isLoading = true;
                   });
-                  await Provider.of<AuthProvider>(context, listen: false)
-                      .removeCredentials();
+                  await logout();
+
                   Navigator.of(context).push(
                     MaterialPageRoute(
                       builder: (context) {

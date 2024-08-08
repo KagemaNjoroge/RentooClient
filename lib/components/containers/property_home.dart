@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../../constants.dart';
 import '../../models/property.dart';
+import '../../providers/destination_provider.dart';
 import '../../sdk/property.dart';
 import '../../utils/snack.dart';
 import '../common/gap.dart';
@@ -184,6 +186,35 @@ class PropertyHome extends StatefulWidget {
 }
 
 class _PropertyHomeState extends State<PropertyHome> {
+  @override
+  Widget build(BuildContext context) {
+    return ChangeNotifierProvider(
+      create: (_) => DestinationProvider(),
+      builder: (context, child) {
+        List<Widget> destinations = [
+          const PropertyMainView(),
+          PropertyDetailsBottomSheet(
+              propertyId: Provider.of<DestinationProvider>(context).data_)
+        ];
+        if (Provider.of<DestinationProvider>(context).data_ != 0) {
+          return destinations[
+              Provider.of<DestinationProvider>(context).destination];
+        } else {
+          return destinations[0];
+        }
+      },
+    );
+  }
+}
+
+class PropertyMainView extends StatefulWidget {
+  const PropertyMainView({super.key});
+
+  @override
+  State<PropertyMainView> createState() => _PropertyMainViewState();
+}
+
+class _PropertyMainViewState extends State<PropertyMainView> {
   final PropertyAPI _propertyAPI = PropertyAPI();
 
   final bool _propertyExists = true;
@@ -282,13 +313,12 @@ class _PropertyHomeState extends State<PropertyHome> {
                                 TextButton(
                                   child: Text(property.name ?? ''),
                                   onPressed: () {
-                                    showBottomSheet(
-                                      context: context,
-                                      builder: (context) {
-                                        return PropertyDetailsBottomSheet(
-                                            propertyId: property.id);
-                                      },
-                                    );
+                                    Provider.of<DestinationProvider>(context,
+                                            listen: false)
+                                        .setData(property.id);
+                                    Provider.of<DestinationProvider>(context,
+                                            listen: false)
+                                        .changeDestination(1);
                                   },
                                 ),
                               ),
