@@ -143,10 +143,26 @@ class TenantsAPI implements BaseApi {
       String url, XFile file, String field) {
     throw UnimplementedError();
   }
-  
+
   @override
-  Future<Map<String, dynamic>> getItem(String url, {Map<String, dynamic>? queryParameters}) {
-    // TODO: implement getItem
-    throw UnimplementedError();
+  Future<Map<String, dynamic>> getItem(String url,
+      {Map<String, dynamic>? queryParameters}) async {
+    try {
+      final response = await _dio.get(url, queryParameters: queryParameters);
+      if (response.statusCode == 200) {
+        return {
+          "status": "success",
+          "tenant": Tenant.fromJson(response.data),
+        };
+      } else {
+        throw DioException(
+          requestOptions: response.requestOptions,
+          response: response,
+          error: "Failed to load tenant",
+        );
+      }
+    } catch (e) {
+      throw handleError(e);
+    }
   }
 }
