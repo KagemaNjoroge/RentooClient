@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class BrightnessProvider with ChangeNotifier {
   bool isDark = false;
+  String value = "isDark";
 
   BrightnessProvider() {
     init();
@@ -10,13 +11,18 @@ class BrightnessProvider with ChangeNotifier {
 
   void init() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    isDark = prefs.getBool('isDark') ?? false;
+    isDark = prefs.getBool(value) ?? false;
     notifyListeners();
   }
 
   void saveTheme() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setBool('isDark', isDark);
+    prefs.setBool(value, isDark);
+  }
+
+  Future<void> removeThemeData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.remove(value);
   }
 
   void swithTheme() {
