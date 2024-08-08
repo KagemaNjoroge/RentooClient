@@ -1,8 +1,9 @@
 // to get the houses in a specific property
 import 'package:dio/dio.dart';
 import 'package:file_selector/file_selector.dart';
-import 'package:rentoo_pms/models/house.dart';
-import 'package:rentoo_pms/sdk/base.dart';
+
+import '../../models/house.dart';
+import '../base.dart';
 
 class HouseStatsAPI implements BaseApi {
   final Dio _dio = Dio();
