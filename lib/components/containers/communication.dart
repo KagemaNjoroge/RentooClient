@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:rentoo_pms/components/common/gap.dart';
 
 import '../../constants.dart';
 import '../../utils/snack.dart';
+import '../common/gap.dart';
 
 class Communication extends StatefulWidget {
   const Communication({super.key});
@@ -13,6 +13,42 @@ class Communication extends StatefulWidget {
 
 class _CommunicationState extends State<Communication> {
   List messages = [
+    {
+      "from": "Kagema Njoroge",
+      "time": DateTime.now(),
+      "message": "I will be settling the rent payments this weekend",
+      "read": false,
+    },
+    {
+      "read": true,
+      "from": "Jane Doe",
+      "time": DateTime.now(),
+      "message": "I have not received the rent payment yet",
+    },
+    {
+      "from": "Kagema Njoroge",
+      "time": DateTime.now(),
+      "message": "I will be settling the rent payments this weekend",
+      "read": false,
+    },
+    {
+      "read": true,
+      "from": "Jane Doe",
+      "time": DateTime.now(),
+      "message": "I have not received the rent payment yet",
+    },
+    {
+      "from": "Kagema Njoroge",
+      "time": DateTime.now(),
+      "message": "I will be settling the rent payments this weekend",
+      "read": false,
+    },
+    {
+      "read": true,
+      "from": "Jane Doe",
+      "time": DateTime.now(),
+      "message": "I have not received the rent payment yet",
+    },
     {
       "from": "Kagema Njoroge",
       "time": DateTime.now(),
