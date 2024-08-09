@@ -7,6 +7,7 @@ import '../../providers/destination_provider.dart';
 import '../../sdk/property.dart';
 import '../../utils/snack.dart';
 import '../common/gap.dart';
+import '../common/progress_indicator.dart';
 import 'house_details.dart';
 
 class AddHouseBottomSheet extends StatefulWidget {
@@ -93,7 +94,7 @@ class _AddHouseBottomSheetState extends State<AddHouseBottomSheet> {
                         );
                       }
 
-                      return const CircularProgressIndicator.adaptive();
+                      return const CustomProgressIndicator();
                     },
                   )
                 ],
@@ -218,7 +219,7 @@ class _AddHouseBottomSheetState extends State<AddHouseBottomSheet> {
                       ? const SizedBox(
                           width: 20,
                           height: 20,
-                          child: CircularProgressIndicator.adaptive(),
+                          child: CustomProgressIndicator(),
                         )
                       : const Text("Save"),
                 ),
@@ -324,7 +325,7 @@ class _HousesMainViewState extends State<HousesMainView> {
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(
-                      child: CircularProgressIndicator.adaptive(),
+                      child: CustomProgressIndicator(),
                     );
                   }
                   if (snapshot.connectionState == ConnectionState.done &&
@@ -366,8 +367,7 @@ class _HousesMainViewState extends State<HousesMainView> {
                       );
                     } else {
                       return DataTable(
-                        showCheckboxColumn: true,
-                        onSelectAll: (value) {},
+                        showCheckboxColumn: false,
                         columns: const [
                           DataColumn(label: Text("House Number")),
                           DataColumn(label: Text("Property")),
@@ -405,7 +405,7 @@ class _HousesMainViewState extends State<HousesMainView> {
                     }
                   }
                   return const Center(
-                    child: CircularProgressIndicator.adaptive(),
+                    child: CustomProgressIndicator(),
                   );
                 },
               ),
