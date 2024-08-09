@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../components/common/gap.dart';
+import '../components/common/progress_indicator.dart';
 import '../constants.dart';
 import '../providers/auth_provider.dart';
 import '../sdk/auth/login.dart';
@@ -175,7 +176,7 @@ class __FormContentState extends State<_FormContent> {
                   child: _isLoading
                       ? const Padding(
                           padding: EdgeInsets.all(8.0),
-                          child: CircularProgressIndicator.adaptive(),
+                          child: CustomProgressIndicator(),
                         )
                       : const Padding(
                           padding: EdgeInsets.all(10.0),
