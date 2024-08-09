@@ -12,6 +12,7 @@ import '../../sdk/settings/mpesa_payment_settings.dart';
 import '../../sdk/user.dart';
 import '../../utils/snack.dart';
 import '../common/gap.dart';
+import '../common/progress_indicator.dart';
 import '../common/theme_toggle_switch.dart';
 
 class CompanyLogo extends StatelessWidget {
@@ -232,8 +233,7 @@ class _SystemSettingsTabState extends State<SystemSettingsTab> {
                     return _companyDetailsForm(true);
                   }
                 }
-                return const Center(
-                    child: CircularProgressIndicator.adaptive());
+                return const Center(child: CustomProgressIndicator());
               },
             ),
           ),
@@ -542,7 +542,7 @@ class _PaymentSettingsTabState extends State<PaymentSettingsTab> {
                 );
               }
               return const Center(
-                child: CircularProgressIndicator.adaptive(),
+                child: CustomProgressIndicator(),
               );
             },
           )
@@ -743,8 +743,7 @@ class _UserSettingsTabState extends State<UserSettingsTab> {
                     ),
                   );
                 } else {
-                  return const Center(
-                      child: CircularProgressIndicator.adaptive());
+                  return const Center(child: CustomProgressIndicator());
                 }
               },
               future: _userAPI.get(usersUrl),
@@ -867,9 +866,7 @@ class _AddUserBottomSheetState extends State<AddUserBottomSheet> {
                         icon: const Icon(Icons.done),
                         label: _isLoading
                             ? const Center(
-                                child: CircularProgressIndicator.adaptive(
-                                  strokeWidth: 2,
-                                ),
+                                child: CustomProgressIndicator(),
                               )
                             : const Text("Save"),
                       ),
@@ -1040,9 +1037,7 @@ class _MpesaPaymentsSettingsBottomSheetState
                       icon: const Icon(Icons.done),
                       label: _isLoading
                           ? const Center(
-                              child: CircularProgressIndicator.adaptive(
-                                strokeWidth: 2,
-                              ),
+                              child: CustomProgressIndicator(),
                             )
                           : const Text("Save"),
                     ),
@@ -1131,12 +1126,12 @@ class _MpesaPaymentsSettingsBottomSheetState
                 }
               } else {
                 return const Center(
-                  child: CircularProgressIndicator.adaptive(),
+                  child: CustomProgressIndicator(),
                 );
               }
             }
             return const Center(
-              child: CircularProgressIndicator.adaptive(),
+              child: CustomProgressIndicator(),
             );
           },
         ),
