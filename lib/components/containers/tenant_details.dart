@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:rentoo_pms/constants.dart';
-import 'package:rentoo_pms/sdk/tenants.dart';
 
+import '../../constants.dart';
 import '../../models/tenant.dart';
 import '../../providers/destination_provider.dart';
+import '../../sdk/tenants.dart';
+import '../../utils/snack.dart';
 import '../common/gap.dart';
+import '../common/progress_indicator.dart';
 
 class TenantDetails extends StatefulWidget {
   int tenantID;
@@ -126,10 +128,62 @@ class _TenantDetailsState extends State<TenantDetails> {
                         ),
                         Expanded(
                           flex: 2,
-                          child: Column(
-                            children: [
-                              Text("${tenant.firstName}"),
-                            ],
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    const Text(
+                                      "First Name:",
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    const HorizontalGap(),
+                                    Text("${tenant.firstName}"),
+                                  ],
+                                ),
+                                const Gap(),
+                                Row(
+                                  children: [
+                                    const Text(
+                                      "Other Name:",
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    const HorizontalGap(),
+                                    Text("${tenant.lastName}"),
+                                  ],
+                                ),
+                                const Gap(),
+                                Row(
+                                  children: [
+                                    const Icon(
+                                      Icons.language_sharp,
+                                      color: kPrimaryColor,
+                                      size: 16,
+                                    ),
+                                    const HorizontalGap(),
+                                    MouseRegion(
+                                      cursor: SystemMouseCursors.click,
+                                      onHover: (event) {
+                                        showSnackBar(context, kPrimaryColor,
+                                            "Website hovered", 200);
+                                      },
+                                      child: Text(
+                                        "${tenant.website}",
+                                        style: const TextStyle(
+                                          color: Colors.lightBlue,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
                           ),
                         )
                       ],
@@ -137,7 +191,7 @@ class _TenantDetailsState extends State<TenantDetails> {
                   ],
                 );
               }
-              return const CircularProgressIndicator.adaptive();
+              return const CustomProgressIndicator();
             },
           )
         ],
