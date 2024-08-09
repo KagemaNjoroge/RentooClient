@@ -11,6 +11,7 @@ import '../../sdk/property.dart';
 import '../../utils/dates_parser.dart';
 import '../../utils/snack.dart';
 import '../common/gap.dart';
+import '../common/progress_indicator.dart';
 import 'dashboard.dart';
 
 class MaintenanceHome extends StatefulWidget {
@@ -283,22 +284,28 @@ class _MaintainersHomeState extends State<MaintainersHome> {
                         );
                       }
 
-                      return DataTable(columns: const [
-                        DataColumn(
-                          label: Text("ID"),
-                        ),
-                        DataColumn(
-                          label: Text("Name"),
-                        ),
-                        DataColumn(label: Text("Type"))
-                      ], rows: items);
+                      return DataTable(
+                        columns: const [
+                          DataColumn(
+                            label: Text("ID"),
+                          ),
+                          DataColumn(
+                            label: Text("Name"),
+                          ),
+                          DataColumn(
+                            label: Text("Type"),
+                          )
+                        ],
+                        rows: items,
+                        showCheckboxColumn: false,
+                      );
                     }
                   } else {
                     return const Text("An error occurred");
                   }
                 }
 
-                return const CircularProgressIndicator.adaptive();
+                return const CustomProgressIndicator();
               },
             ),
           )
@@ -529,7 +536,7 @@ class _MaintenancesViewState extends State<MaintenancesView> {
                     );
                   }
 
-                  return const CircularProgressIndicator.adaptive();
+                  return const CustomProgressIndicator();
                 },
               ),
               const Gap(),
@@ -620,7 +627,7 @@ class _MaintenancesViewState extends State<MaintenancesView> {
                     },
                     label: _isLoading
                         ? const Center(
-                            child: CircularProgressIndicator.adaptive(),
+                            child: CustomProgressIndicator(),
                           )
                         : const Text("Add"),
                     icon: const Icon(Icons.done),
@@ -856,13 +863,17 @@ class _MaintenancesViewState extends State<MaintenancesView> {
                                 ),
                               ),
                               const Gap(),
-                              DataTable(columns: const [
-                                DataColumn(label: Text("Id")),
-                                DataColumn(label: Text("House")),
-                                DataColumn(label: Text("Issue")),
-                                DataColumn(label: Text("Date Requested")),
-                                DataColumn(label: Text("Is completed"))
-                              ], rows: items),
+                              DataTable(
+                                columns: const [
+                                  DataColumn(label: Text("Id")),
+                                  DataColumn(label: Text("House")),
+                                  DataColumn(label: Text("Issue")),
+                                  DataColumn(label: Text("Date Requested")),
+                                  DataColumn(label: Text("Is completed"))
+                                ],
+                                rows: items,
+                                showCheckboxColumn: false,
+                              ),
                             ],
                           ),
                         ),
@@ -874,7 +885,7 @@ class _MaintenancesViewState extends State<MaintenancesView> {
               if (snapshot.hasError) {
                 return Text(snapshot.error.toString());
               }
-              return const Center(child: CircularProgressIndicator.adaptive());
+              return const Center(child: CustomProgressIndicator());
             },
           ),
         )
