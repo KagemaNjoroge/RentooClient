@@ -7,6 +7,7 @@ import '../../providers/destination_provider.dart';
 import '../../sdk/property.dart';
 import '../../utils/snack.dart';
 import '../common/gap.dart';
+import '../common/progress_indicator.dart';
 import 'property_details.dart';
 
 class AddPropertyBottomSheet extends StatefulWidget {
@@ -166,7 +167,7 @@ class _AddPropertyBottomSheetState extends State<AddPropertyBottomSheet> {
                   },
                   icon: const Icon(Icons.done),
                   label: _isLoading
-                      ? const CircularProgressIndicator.adaptive()
+                      ? const CustomProgressIndicator()
                       : const Text("Save"),
                 ),
               ],
@@ -350,8 +351,7 @@ class _PropertyMainViewState extends State<PropertyMainView> {
                       ],
                     );
                   }
-                  return const Center(
-                      child: CircularProgressIndicator.adaptive());
+                  return const Center(child: CustomProgressIndicator());
                 },
                 future: _propertyAPI.get(propertyUrl),
               ),
