@@ -11,6 +11,7 @@ import '../../utils/snack.dart';
 import '../common/buttons/export_csv_button.dart';
 import '../common/buttons/export_pdf_button.dart';
 import '../common/gap.dart';
+import '../common/progress_indicator.dart';
 
 class AddLeasesBottomSheet extends StatefulWidget {
   const AddLeasesBottomSheet({super.key});
@@ -119,7 +120,7 @@ class _AddLeasesBottomSheetState extends State<AddLeasesBottomSheet> {
                   );
                 }
 
-                return const CircularProgressIndicator.adaptive();
+                return const CustomProgressIndicator();
               },
             ),
             const Gap(),
@@ -155,7 +156,7 @@ class _AddLeasesBottomSheetState extends State<AddLeasesBottomSheet> {
                   );
                 }
 
-                return const CircularProgressIndicator.adaptive();
+                return const CustomProgressIndicator();
               },
             ),
             const Gap(),
@@ -215,7 +216,7 @@ class _AddLeasesBottomSheetState extends State<AddLeasesBottomSheet> {
                     }
                   },
                   label: _isLoading
-                      ? const CircularProgressIndicator.adaptive()
+                      ? const CustomProgressIndicator()
                       : const Text("Save"),
                   icon: const Icon(Icons.done),
                 ),
@@ -303,7 +304,7 @@ class _LeasesHomeState extends State<LeasesHome> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Center(
-                      child: CircularProgressIndicator.adaptive(),
+                      child: CustomProgressIndicator(),
                     ),
                     SizedBox(
                       height: 20,
@@ -385,7 +386,7 @@ class _LeasesHomeState extends State<LeasesHome> {
                 return Text(snapshot.error.toString());
               }
               return const Center(
-                child: CircularProgressIndicator.adaptive(),
+                child: CustomProgressIndicator(),
               );
             },
           ),
