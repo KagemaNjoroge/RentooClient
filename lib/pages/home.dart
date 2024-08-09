@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../components/common/progress_indicator.dart';
 import '../components/containers/communication.dart';
 import '../components/containers/dashboard.dart';
 import '../components/containers/help_and_support.dart';
@@ -18,7 +19,6 @@ import '../components/notifications.dart';
 import '../constants.dart';
 import '../providers/auth_provider.dart';
 import '../providers/brightness.dart';
-import '../utils/snack.dart';
 import 'login.dart';
 
 class Home extends StatefulWidget {
@@ -121,7 +121,7 @@ class _HomeState extends State<Home> {
               trailing: IconButton(
                 tooltip: "Logout",
                 icon: _isLoading
-                    ? const CircularProgressIndicator.adaptive()
+                    ? const CustomProgressIndicator()
                     : const Icon(Icons.logout_sharp),
                 onPressed: () async {
                   setState(() {
@@ -237,8 +237,10 @@ class _HomeState extends State<Home> {
                 IconButton(
                   tooltip: "AI assistant",
                   onPressed: () {
-                    showSnackBar(
-                        context, Colors.green, "Attach action here", 300);
+                    showDialog(
+                      context: context,
+                      builder: (context) => const AiAssistantDialog(),
+                    );
                   },
                   icon: const Icon(Icons.assistant),
                 ),
@@ -257,6 +259,77 @@ class _HomeState extends State<Home> {
           ],
         ),
       ),
+    );
+  }
+}
+
+class AiAssistantDialog extends StatefulWidget {
+  const AiAssistantDialog({super.key});
+
+  @override
+  State<AiAssistantDialog> createState() => _AiAssistantDialogState();
+}
+
+class _AiAssistantDialogState extends State<AiAssistantDialog> {
+  // controllers and keys
+  final GlobalKey<FormState> _key = GlobalKey();
+  final TextEditingController _promptController = TextEditingController();
+  // state
+  bool _isLoading = false;
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text("Chat with Zoe"),
+      content: Form(
+          key: _key,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextFormField(
+                validator: (value) {
+                  if (value!.isEmpty) {
+                    return "A prompt is required";
+                  }
+                  return null;
+                },
+                minLines: 3,
+                maxLines: 5,
+                controller: _promptController,
+                decoration: const InputDecoration(
+                  hintText:
+                      "Ask something like - Which houses are currently unoccupied?",
+                  border: OutlineInputBorder(),
+                  icon: Icon(
+                    Icons.message,
+                    color: kPrimaryColor,
+                  ),
+                ),
+              )
+            ],
+          )),
+      actions: [
+        ElevatedButton.icon(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          label: const Text("Close"),
+          icon: const Icon(Icons.close),
+        ),
+        TextButton.icon(
+          onPressed: () {
+            if (_key.currentState!.validate()) {
+              setState(() {
+                _isLoading = true;
+              });
+            }
+          },
+          label: _isLoading
+              ? const CustomProgressIndicator()
+              : const Icon(
+                  Icons.send,
+                ),
+        )
+      ],
     );
   }
 }
