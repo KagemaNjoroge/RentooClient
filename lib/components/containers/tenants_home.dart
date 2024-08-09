@@ -7,6 +7,7 @@ import '../../providers/destination_provider.dart';
 import '../../sdk/tenants.dart';
 import '../../utils/snack.dart';
 import '../common/gap.dart';
+import '../common/progress_indicator.dart';
 import 'tenant_details.dart';
 
 class TenantsMainView extends StatefulWidget {
@@ -205,7 +206,7 @@ class _TenantsMainViewState extends State<TenantsMainView> {
                     }
                   },
                   label: _isLoading
-                      ? const CircularProgressIndicator.adaptive()
+                      ? const CustomProgressIndicator()
                       : const Text("Save"),
                   icon: const Icon(Icons.done),
                 ),
@@ -354,7 +355,7 @@ class _TenantsMainViewState extends State<TenantsMainView> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Center(
-                  child: CircularProgressIndicator.adaptive(),
+                  child: CustomProgressIndicator(),
                 ),
                 SizedBox(
                   height: 20,
