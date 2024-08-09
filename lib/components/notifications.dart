@@ -4,6 +4,7 @@ import '../constants.dart';
 import '../models/notification.dart';
 import '../sdk/notifications.dart';
 import '../utils/snack.dart';
+import 'common/progress_indicator.dart';
 
 class NotificationsModal extends StatefulWidget {
   const NotificationsModal({super.key});
@@ -68,7 +69,7 @@ class _NotificationsModalState extends State<NotificationsModal> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Center(
-              child: CircularProgressIndicator.adaptive(),
+              child: CustomProgressIndicator(),
             ),
           ],
         );
