@@ -4,6 +4,7 @@ import '../../constants.dart';
 import '../../models/stats/property_stats.dart';
 import '../../sdk/stats/property_stats.dart';
 import '../../utils/snack.dart';
+import '../common/progress_indicator.dart';
 import '../rent_collection_sample_chart.dart';
 
 class RecentMessages extends StatelessWidget {
@@ -172,7 +173,7 @@ class _DashboardState extends State<Dashboard> {
                   );
                 }
                 return const Center(
-                  child: CircularProgressIndicator.adaptive(),
+                  child: CustomProgressIndicator(),
                 );
               },
             ),
