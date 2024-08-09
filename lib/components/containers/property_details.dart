@@ -8,6 +8,7 @@ import '../../providers/destination_provider.dart';
 import '../../sdk/photos.dart';
 import '../../sdk/property.dart';
 import '../common/gap.dart';
+import '../common/progress_indicator.dart';
 import '../image_slider.dart';
 
 class PropertyDetailsBottomSheet extends StatefulWidget {
@@ -155,7 +156,7 @@ class _PropertyDetailsBottomSheetState
                                   return Text("${houses.length}");
                                 }
                                 return const Center(
-                                  child: CircularProgressIndicator.adaptive(),
+                                  child: CustomProgressIndicator(),
                                 );
                               },
                             ),
@@ -167,7 +168,7 @@ class _PropertyDetailsBottomSheetState
                 );
               }
               return const Center(
-                child: CircularProgressIndicator.adaptive(),
+                child: CustomProgressIndicator(),
               );
             },
           ),
