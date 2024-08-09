@@ -12,6 +12,7 @@ import '../../utils/snack.dart';
 import '../common/buttons/export_csv_button.dart';
 import '../common/buttons/export_pdf_button.dart';
 import '../common/gap.dart';
+import '../common/progress_indicator.dart';
 
 class PaymentsHome extends StatefulWidget {
   const PaymentsHome({super.key});
@@ -145,7 +146,7 @@ class _PaymentsHomeState extends State<PaymentsHome> {
                 }
               }
               return const Center(
-                child: CircularProgressIndicator.adaptive(),
+                child: CustomProgressIndicator(),
               );
             },
           ),
@@ -296,7 +297,7 @@ class _AddPaymentBottomSheetState extends State<AddPaymentBottomSheet> {
                               });
                         }
                         return const Center(
-                          child: CircularProgressIndicator.adaptive(),
+                          child: CustomProgressIndicator(),
                         );
                       }),
                   const Gap(),
