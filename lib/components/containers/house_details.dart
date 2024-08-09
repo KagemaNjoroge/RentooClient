@@ -12,6 +12,7 @@ import '../../sdk/property.dart';
 import '../../sdk/temporary_file.dart';
 import '../../utils/snack.dart';
 import '../common/gap.dart';
+import '../common/progress_indicator.dart';
 import '../image_slider.dart';
 
 class HouseDetails extends StatefulWidget {
@@ -140,7 +141,7 @@ class _HouseDetailsState extends State<HouseDetails> {
                   return Text(snapshot.error.toString());
                 }
                 return const Center(
-                  child: CircularProgressIndicator.adaptive(),
+                  child: CustomProgressIndicator(),
                 );
               },
             ),
