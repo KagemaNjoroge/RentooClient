@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'components/common/progress_indicator.dart';
 import 'constants.dart';
 import 'pages/home.dart';
 import 'pages/login.dart';
@@ -75,7 +76,7 @@ class MyApp extends StatelessWidget {
                   );
                 }
               }
-              return const Center(child: CircularProgressIndicator.adaptive());
+              return const Center(child: CustomProgressIndicator());
             },
           );
         },
